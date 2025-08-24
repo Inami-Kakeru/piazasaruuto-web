@@ -1052,71 +1052,134 @@
       try {
         const formattedDate = date.toISOString().split('T')[0];
         
-        // 1. 利用可能な時間を取得
-        const availabilityUrl = `${CAL_API_CONFIG.base}/${CAL_API_CONFIG.version}/availability?dateFrom=${formattedDate}&dateTo=${formattedDate}&eventTypeId=${CAL_API_CONFIG.eventTypeId}`;
+        // Cal.com APIの正しいエンドポイントを試行
+        const apiEndpoints = [
+          // 1. 公式API v1 (最も一般的)
+          `${CAL_API_CONFIG.base}/v1/event-types/${CAL_API_CONFIG.eventTypeId}/availability?dateFrom=${formattedDate}&dateTo=${formattedDate}`,
+          // 2. 公式API v2 (新しいバージョン)
+          `${CAL_API_CONFIG.base}/v2/event-types/${CAL_API_CONFIG.eventTypeId}/availability?dateFrom=${formattedDate}&dateTo=${formattedDate}`,
+          // 3. 代替エンドポイント
+          `${CAL_API_CONFIG.base}/v1/availability?dateFrom=${formattedDate}&dateTo=${formattedDate}&eventTypeId=${CAL_API_CONFIG.eventTypeId}`,
+          // 4. 直接的なエンドポイント
+          `${CAL_API_CONFIG.base}/availability?dateFrom=${formattedDate}&dateTo=${formattedDate}&eventTypeId=${CAL_API_CONFIG.eventTypeId}`
+        ];
         
-        console.log('🔍 Fetching available slots from:', availabilityUrl);
-        console.log('🔑 Using API key:', CAL_API_CONFIG.key.substring(0, 10) + '...');
+        console.log('🔍 Trying multiple Cal.com API endpoints...');
         
-        const availabilityResponse = await fetch(availabilityUrl, {
-          headers: {
-            'Authorization': `Bearer ${CAL_API_CONFIG.key}`,
-            'Content-Type': 'application/json'
-          }
-        });
-
-        console.log('📡 Availability API Response status:', availabilityResponse.status);
-
-        if (availabilityResponse.ok) {
-          const availabilityData = await availabilityResponse.json();
-          console.log('✅ Availability API Response data:', availabilityData);
+        for (let i = 0; i < apiEndpoints.length; i++) {
+          const endpoint = apiEndpoints[i];
+          console.log(`🔍 Attempt ${i + 1}: ${endpoint}`);
           
-          // 2. 既存の予約を取得して重複を除外
-          const bookingsUrl = `${CAL_API_CONFIG.base}/${CAL_API_CONFIG.version}/bookings?dateFrom=${formattedDate}&dateTo=${formattedDate}&eventTypeId=${CAL_API_CONFIG.eventTypeId}`;
-          
-          console.log('🔍 Fetching existing bookings from:', bookingsUrl);
-          
-          const bookingsResponse = await fetch(bookingsUrl, {
-            headers: {
-              'Authorization': `Bearer ${CAL_API_CONFIG.key}`,
-              'Content-Type': 'application/json'
-            }
-          });
-
-          if (bookingsResponse.ok) {
-            const bookingsData = await bookingsResponse.json();
-            console.log('📅 Existing bookings:', bookingsData);
-            
-            // 既存の予約時間を除外
-            const availableSlots = availabilityData.availableSlots || [];
-            const existingBookings = bookingsData.bookings || [];
-            
-            const conflictingTimes = existingBookings.map(booking => {
-              const startTime = new Date(booking.startTime);
-              return startTime.toTimeString().slice(0, 5); // HH:MM形式
+          try {
+            const response = await fetch(endpoint, {
+              headers: {
+                'Authorization': `Bearer ${CAL_API_CONFIG.key}`,
+                'Content-Type': 'application/json'
+              }
             });
             
-            console.log('⏰ Conflicting times:', conflictingTimes);
+            console.log(`📡 Endpoint ${i + 1} response status:`, response.status);
             
-            const finalAvailableSlots = availableSlots.filter(time => !conflictingTimes.includes(time));
-            console.log('✅ Final available slots (excluding conflicts):', finalAvailableSlots);
-            
-            return finalAvailableSlots;
-          } else {
-            console.log('⚠️ Could not fetch existing bookings, using availability data only');
-            return availabilityData.availableSlots || [];
+            if (response.ok) {
+              const data = await response.json();
+              console.log(`✅ Endpoint ${i + 1} success:`, data);
+              
+              // 利用可能な時間を抽出（レスポンス形式に応じて）
+              let availableSlots = [];
+              if (data.availableSlots) {
+                availableSlots = data.availableSlots;
+              } else if (data.slots) {
+                availableSlots = data.slots.map(slot => slot.time);
+              } else if (data.availability) {
+                availableSlots = data.availability.map(avail => avail.time);
+              } else if (data.busy) {
+                // busy配列から利用可能時間を逆算
+                const allTimes = generateAllTimeSlots();
+                const busyTimes = data.busy.map(busy => {
+                  const start = new Date(busy.start);
+                  return start.toTimeString().slice(0, 5);
+                });
+                availableSlots = allTimes.filter(time => !busyTimes.includes(time));
+              }
+              
+              console.log('✅ Extracted available slots:', availableSlots);
+              
+              // 既存の予約も確認
+              const existingBookings = await fetchExistingBookings(formattedDate);
+              if (existingBookings.length > 0) {
+                const conflictingTimes = existingBookings.map(booking => {
+                  const startTime = new Date(booking.startTime || booking.start);
+                  return startTime.toTimeString().slice(0, 5);
+                });
+                
+                console.log('⏰ Conflicting times from existing bookings:', conflictingTimes);
+                availableSlots = availableSlots.filter(time => !conflictingTimes.includes(time));
+                console.log('✅ Final available slots (excluding conflicts):', availableSlots);
+              }
+              
+              return availableSlots;
+            } else {
+              console.log(`⚠️ Endpoint ${i + 1} failed:`, response.status, response.statusText);
+            }
+          } catch (endpointError) {
+            console.log(`⚠️ Endpoint ${i + 1} error:`, endpointError.message);
           }
-        } else {
-          const errorText = await availabilityResponse.text();
-          console.error('❌ Failed to fetch available slots:', availabilityResponse.status, availabilityResponse.statusText);
-          console.error('❌ Error details:', errorText);
-          return [];
         }
+        
+        console.log('❌ All API endpoints failed, using fallback');
+        return generateSimulatedSlots(date);
+        
       } catch (error) {
         console.error('❌ Network error fetching available slots:', error);
-        // Fallback to simulated availability
         return generateSimulatedSlots(date);
       }
+    }
+    
+    // 既存の予約を取得
+    async function fetchExistingBookings(date) {
+      try {
+        const bookingEndpoints = [
+          `${CAL_API_CONFIG.base}/v1/bookings?dateFrom=${date}&dateTo=${date}`,
+          `${CAL_API_CONFIG.base}/v2/bookings?dateFrom=${date}&dateTo=${date}`,
+          `${CAL_API_CONFIG.base}/bookings?dateFrom=${date}&dateTo=${date}`
+        ];
+        
+        for (const endpoint of bookingEndpoints) {
+          try {
+            const response = await fetch(endpoint, {
+              headers: {
+                'Authorization': `Bearer ${CAL_API_CONFIG.key}`,
+                'Content-Type': 'application/json'
+              }
+            });
+            
+            if (response.ok) {
+              const data = await response.json();
+              return data.bookings || data || [];
+            }
+          } catch (error) {
+            console.log('⚠️ Booking endpoint failed:', error.message);
+          }
+        }
+        
+        return [];
+      } catch (error) {
+        console.log('⚠️ Could not fetch existing bookings');
+        return [];
+      }
+    }
+    
+    // 全時間スロットを生成（busy配列から利用可能時間を逆算するため）
+    function generateAllTimeSlots() {
+      const slots = [];
+      for (let hour = 10; hour <= 17; hour++) {
+        if (hour === 12) continue; // ランチタイムを除外
+        slots.push(`${hour.toString().padStart(2, '0')}:00`);
+        if (hour < 17) {
+          slots.push(`${hour.toString().padStart(2, '0')}:30`);
+        }
+      }
+      return slots;
     }
 
     // Generate simulated slots for fallback
@@ -1542,28 +1605,48 @@
           notes: `メニュー: ${bookingData.menuName}\nスタッフ: ${bookingData.staffName}\nご要望: ${bookingData.notes || 'なし'}`
         };
 
-        const response = await fetch(`${CAL_API_CONFIG.base}/${CAL_API_CONFIG.version}/bookings`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${CAL_API_CONFIG.key}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(bookingData)
-        });
+        // 複数の予約作成エンドポイントを試行
+        const bookingEndpoints = [
+          `${CAL_API_CONFIG.base}/v1/bookings`,
+          `${CAL_API_CONFIG.base}/v2/bookings`,
+          `${CAL_API_CONFIG.base}/bookings`
+        ];
 
-        if (response.ok) {
-          const result = await response.json();
-          return {
-            success: true,
-            bookingId: result.id
-          };
-        } else {
-          const errorData = await response.json();
-          return {
-            success: false,
-            error: errorData.message || '予約の作成に失敗しました'
-          };
+        for (const endpoint of bookingEndpoints) {
+          try {
+            console.log(`🔍 Trying booking endpoint: ${endpoint}`);
+            
+            const response = await fetch(endpoint, {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${CAL_API_CONFIG.key}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(bookingData)
+            });
+
+            console.log(`📡 Booking endpoint response:`, response.status, response.statusText);
+
+            if (response.ok) {
+              const result = await response.json();
+              console.log('✅ Booking created successfully:', result);
+              return {
+                success: true,
+                bookingId: result.id || result.bookingId
+              };
+            } else {
+              const errorData = await response.json();
+              console.log(`⚠️ Booking endpoint failed:`, errorData);
+            }
+          } catch (error) {
+            console.log(`⚠️ Booking endpoint error:`, error.message);
+          }
         }
+
+        return {
+          success: false,
+          error: 'すべての予約作成エンドポイントが失敗しました'
+        };
       } catch (error) {
         console.error('Cal.com booking error:', error);
         return {

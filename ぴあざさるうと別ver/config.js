@@ -10,8 +10,8 @@ window.CAL_CONFIG = {
   CAL_WEBHOOK_SECRET: 'whsec_fffhhahijigsighioabn',
   WEBHOOK_PUBLIC_URL: 'https://your-domain.com/api/webhook/cal',
   
-  // イベントタイプID
-  EVENT_TYPE_ID: '稲見駆-7zb7cf/15min',
+  // イベントタイプID (Cal.comの正しい形式)
+  EVENT_TYPE_ID: '稲見駆-7zb7cf', // スラッシュ以降は削除
   
   // 営業時間設定
   BUSINESS_HOURS: {
