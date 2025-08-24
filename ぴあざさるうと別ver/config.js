@@ -3,11 +3,11 @@
 window.CAL_CONFIG = {
   // Cal.com API設定
   CAL_API_BASE: 'https://api.cal.com',
-  CAL_API_KEY: 'cal_test_xxxxxxxxxxxxxxxxxxxxxxxxx', // 実際のAPIキーに置き換えてください
+  CAL_API_KEY: 'cal_live_3612d68cd60686f0545892baf99e1e56', // 実際のAPIキーに置き換えてください
   CAL_API_VERSION: 'v2',
   
   // Webhook設定
-  CAL_WEBHOOK_SECRET: 'whsec_xxxxxxxxxxxxxxxxxxxxx',
+  CAL_WEBHOOK_SECRET: 'whsec_fffhhahijigsighioabn',
   WEBHOOK_PUBLIC_URL: 'https://your-domain.com/api/webhook/cal',
   
   // イベントタイプID
@@ -30,5 +30,5 @@ if (window.location.hostname === 'localhost' || window.location.hostname === '12
   console.log('Development mode: Using local configuration');
   // 開発環境でのデフォルト設定
   window.CAL_CONFIG.CAL_API_BASE = 'https://api.cal.com';
-  window.CAL_CONFIG.CAL_API_KEY = 'cal_test_xxxxxxxxxxxxxxxxxxxxxxxxx';
+  window.CAL_CONFIG.CAL_API_KEY = 'cal_live_3612d68cd60686f0545892baf99e1e56';
 }

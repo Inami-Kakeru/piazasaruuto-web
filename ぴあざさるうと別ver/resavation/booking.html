@@ -534,6 +534,11 @@
       color: var(--border);
       cursor: not-allowed;
       border-color: var(--border);
+      opacity: 0.5;
+    }
+    
+    .time-slot[style*="display: none"] {
+      display: none !important;
     }
 
     /* Selected Date Time Display */
@@ -1069,6 +1074,7 @@
         }
       }
       
+      console.log('Generated simulated slots for', date.toDateString(), ':', slots);
       return slots;
     }
 
@@ -1159,6 +1165,9 @@
       // Fetch available slots from Cal.com API
       availableSlots = await fetchAvailableSlots(date);
       
+      // デバッグ用：取得したスロットを確認
+      console.log('Fetched available slots:', availableSlots);
+      
       // Update time slots availability
       updateTimeSlots(date);
       
@@ -1181,6 +1190,7 @@
         timeSlot.className = 'time-slot';
         timeSlot.textContent = time;
         timeSlot.addEventListener('click', () => selectTime(time));
+        timeSlot.style.display = 'none'; // 初期状態では非表示
         timeGrid.appendChild(timeSlot);
       });
     }
@@ -1197,11 +1207,16 @@
         if (availableSlots.includes(time)) {
           slot.style.display = 'block';
           slot.classList.remove('unavailable');
+          slot.style.cursor = 'pointer';
         } else {
           slot.style.display = 'none';
           slot.classList.add('unavailable');
+          slot.style.cursor = 'not-allowed';
         }
       });
+      
+      // デバッグ用：利用可能な時間をコンソールに出力
+      console.log('Available slots for', date.toDateString(), ':', availableSlots);
     }
 
     // Check if time is available
@@ -1233,6 +1248,7 @@
       selectedTime = time;
       document.getElementById('selectedTime').textContent = time;
       
+      console.log('Selected time:', time);
       updateSelectedDateTime();
     }
 
@@ -1378,16 +1394,83 @@
       bookingData.notes = document.getElementById('notes').value;
     }
 
-    // 予約送信
-    function submitBooking() {
-      // 実際の実装では、サーバーにデータを送信
-      alert('予約が完了しました！\n\nご予約ありがとうございます。\n担当者より確認のご連絡をさせていただきます。');
+        // 予約送信
+    async function submitBooking() {
+      try {
+        // Cal.comに予約を作成
+        const bookingResult = await createCalBooking();
+        
+        if (bookingResult.success) {
+          alert('予約が完了しました！\n\nご予約ありがとうございます。\n担当者より確認のご連絡をさせていただきます。');
+          
+          // 予約データをコンソールに出力（デバッグ用）
+          console.log('Booking Data:', bookingData);
+          console.log('Cal.com Booking ID:', bookingResult.bookingId);
+          
+          // ホームページに戻る
+          window.location.href = '/';
+        } else {
+          alert('予約の作成に失敗しました。\n\nエラー: ' + bookingResult.error + '\n\n再度お試しください。');
+        }
+      } catch (error) {
+        console.error('Booking error:', error);
+        alert('予約の作成中にエラーが発生しました。\n\n再度お試しください。');
+      }
+    }
+
+    // Cal.comに予約を作成
+    async function createCalBooking() {
+      try {
+        const bookingData = {
+          eventTypeId: CAL_API_CONFIG.eventTypeId,
+          startTime: `${bookingData.date}T${bookingData.time}:00`,
+          endTime: calculateEndTime(bookingData.date, bookingData.time, bookingData.menuDuration),
+          attendee: {
+            name: bookingData.customerName,
+            email: bookingData.customerEmail || 'no-email@example.com',
+            phone: bookingData.customerPhone
+          },
+          notes: `メニュー: ${bookingData.menuName}\nスタッフ: ${bookingData.staffName}\nご要望: ${bookingData.notes || 'なし'}`
+        };
+
+        const response = await fetch(`${CAL_API_CONFIG.base}/${CAL_API_CONFIG.version}/bookings`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${CAL_API_CONFIG.key}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(bookingData)
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          return {
+            success: true,
+            bookingId: result.id
+          };
+        } else {
+          const errorData = await response.json();
+          return {
+            success: false,
+            error: errorData.message || '予約の作成に失敗しました'
+          };
+        }
+      } catch (error) {
+        console.error('Cal.com booking error:', error);
+        return {
+          success: false,
+          error: 'ネットワークエラーが発生しました'
+        };
+      }
+    }
+
+    // 終了時間を計算
+    function calculateEndTime(date, startTime, duration) {
+      const start = new Date(`${date}T${startTime}:00`);
+      const durationMinutes = parseInt(duration.match(/\d+/)[0]);
+      const end = new Date(start.getTime() + durationMinutes * 60000);
       
-      // 予約データをコンソールに出力（デバッグ用）
-      console.log('Booking Data:', bookingData);
-      
-             // ホームページに戻る
-       window.location.href = '/';
+      return end.toISOString().slice(0, 16).replace('T', ' ');
     }
 
     // 戻るボタン
