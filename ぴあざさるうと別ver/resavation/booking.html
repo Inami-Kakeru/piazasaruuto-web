@@ -1052,15 +1052,15 @@
       try {
         const formattedDate = date.toISOString().split('T')[0];
         
-        // Cal.com APIの正しいエンドポイントを試行
+        // プロキシサーバー経由でCal.com APIにアクセス（CORS問題を回避）
         const apiEndpoints = [
-          // 1. 公式API v1 (最も一般的)
-          `${CAL_API_CONFIG.base}/v1/event-types/${CAL_API_CONFIG.eventTypeId}/availability?dateFrom=${formattedDate}&dateTo=${formattedDate}`,
-          // 2. 公式API v2 (新しいバージョン)
-          `${CAL_API_CONFIG.base}/v2/event-types/${CAL_API_CONFIG.eventTypeId}/availability?dateFrom=${formattedDate}&dateTo=${formattedDate}`,
-          // 3. 代替エンドポイント
-          `${CAL_API_CONFIG.base}/v1/availability?dateFrom=${formattedDate}&dateTo=${formattedDate}&eventTypeId=${CAL_API_CONFIG.eventTypeId}`,
-          // 4. 直接的なエンドポイント
+          // 1. プロキシサーバー経由（推奨）
+          `http://localhost:3001/api/cal/v1/event-types/${CAL_API_CONFIG.eventTypeId}/availability?dateFrom=${formattedDate}&dateTo=${formattedDate}`,
+          // 2. プロキシサーバー経由 v2
+          `http://localhost:3001/api/cal/v2/event-types/${CAL_API_CONFIG.eventTypeId}/availability?dateFrom=${formattedDate}&dateTo=${formattedDate}`,
+          // 3. プロキシサーバー経由 代替エンドポイント
+          `http://localhost:3001/api/cal/v1/availability?dateFrom=${formattedDate}&dateTo=${formattedDate}&eventTypeId=${CAL_API_CONFIG.eventTypeId}`,
+          // 4. 直接アクセス（フォールバック）
           `${CAL_API_CONFIG.base}/availability?dateFrom=${formattedDate}&dateTo=${formattedDate}&eventTypeId=${CAL_API_CONFIG.eventTypeId}`
         ];
         
@@ -1139,8 +1139,10 @@
     async function fetchExistingBookings(date) {
       try {
         const bookingEndpoints = [
-          `${CAL_API_CONFIG.base}/v1/bookings?dateFrom=${date}&dateTo=${date}`,
-          `${CAL_API_CONFIG.base}/v2/bookings?dateFrom=${date}&dateTo=${date}`,
+          `http://localhost:3001/api/cal/v1/bookings?dateFrom=${date}&dateTo=${date}`,
+          `http://localhost:3001/api/cal/v2/bookings?dateFrom=${date}&dateTo=${date}`,
+          `http://localhost:3001/api/cal/bookings?dateFrom=${date}&dateTo=${date}`,
+          // フォールバック
           `${CAL_API_CONFIG.base}/bookings?dateFrom=${date}&dateTo=${date}`
         ];
         
@@ -1593,7 +1595,7 @@
     // Cal.comに予約を作成
     async function createCalBooking() {
       try {
-        const bookingData = {
+        const bookingPayload = {
           eventTypeId: CAL_API_CONFIG.eventTypeId,
           startTime: `${bookingData.date}T${bookingData.time}:00`,
           endTime: calculateEndTime(bookingData.date, bookingData.time, bookingData.menuDuration),
@@ -1605,10 +1607,12 @@
           notes: `メニュー: ${bookingData.menuName}\nスタッフ: ${bookingData.staffName}\nご要望: ${bookingData.notes || 'なし'}`
         };
 
-        // 複数の予約作成エンドポイントを試行
+        // プロキシサーバー経由で予約作成エンドポイントにアクセス
         const bookingEndpoints = [
-          `${CAL_API_CONFIG.base}/v1/bookings`,
-          `${CAL_API_CONFIG.base}/v2/bookings`,
+          `http://localhost:3001/api/cal/v1/bookings`,
+          `http://localhost:3001/api/cal/v2/bookings`,
+          `http://localhost:3001/api/cal/bookings`,
+          // フォールバック
           `${CAL_API_CONFIG.base}/bookings`
         ];
 
@@ -1616,14 +1620,14 @@
           try {
             console.log(`🔍 Trying booking endpoint: ${endpoint}`);
             
-            const response = await fetch(endpoint, {
-              method: 'POST',
-              headers: {
-                'Authorization': `Bearer ${CAL_API_CONFIG.key}`,
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify(bookingData)
-            });
+                         const response = await fetch(endpoint, {
+               method: 'POST',
+               headers: {
+                 'Authorization': `Bearer ${CAL_API_CONFIG.key}`,
+                 'Content-Type': 'application/json'
+               },
+               body: JSON.stringify(bookingPayload)
+             });
 
             console.log(`📡 Booking endpoint response:`, response.status, response.statusText);
 
