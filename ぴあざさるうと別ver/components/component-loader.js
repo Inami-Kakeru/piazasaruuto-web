@@ -29,7 +29,7 @@ class ComponentLoader {
             }
 
             // コンポーネントファイルのパス
-            const componentPath = `/components/${componentName}.html`;
+            const componentPath = `./components/${componentName}.html`;
             
             // コンポーネントを読み込み
             const response = await fetch(componentPath);
@@ -79,10 +79,12 @@ class ComponentLoader {
      */
     async loadAllComponents() {
         const componentElements = document.querySelectorAll('[data-component]');
+        console.log('Found component elements:', componentElements.length);
         
         for (const element of componentElements) {
             const componentName = element.dataset.component;
             const options = this.parseOptions(element.dataset.options);
+            console.log('Loading component:', componentName, 'for element:', element);
             
             await this.loadComponent(componentName, `[data-component="${componentName}"]`, options);
         }

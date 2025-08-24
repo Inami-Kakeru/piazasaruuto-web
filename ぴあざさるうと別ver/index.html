@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
     <link rel="stylesheet" href="https://app.cal.com/embed/embed.css" />
-    <script src="components/component-loader.js"></script>
+    <script src="./components/component-loader.js"></script>
 </head>
 <body>
     <!-- Header Component -->
@@ -380,25 +380,44 @@
 
         // コンポーネントが読み込まれた後の処理
         document.addEventListener("DOMContentLoaded", function() {
-            // コンポーネントの読み込み完了を待つ
-            setTimeout(() => {
-                // フッターの予約ボタン
-                var footerBtn = document.getElementById("footerReservationBtn");
-                if (footerBtn) {
-                    footerBtn.addEventListener("click", function() {
-                        Cal("open", { calLink: "稲見駆-7zb7cf/15min" });
-                    });
-                }
-                
-                // ヘッダーの予約ボタン
-                var headerBtn = document.getElementById("headerReservationBtn");
-                if (headerBtn) {
-                    headerBtn.addEventListener("click", function() {
-                        Cal("open", { calLink: "稲見駆-7zb7cf/15min" });
-                    });
-                }
-            }, 100);
+            console.log('DOM loaded, checking components...');
+            
+            // コンポーネントローダーが利用可能かチェック
+            if (window.ComponentLoader) {
+                console.log('ComponentLoader found, loading components...');
+                // 手動でコンポーネントを読み込み
+                ComponentLoader.loadAllComponents().then(() => {
+                    console.log('All components loaded, setting up event listeners...');
+                    setupEventListeners();
+                }).catch(error => {
+                    console.error('Error loading components:', error);
+                });
+            } else {
+                console.error('ComponentLoader not found');
+                // フォールバック: 直接コンポーネントを読み込み
+                setTimeout(() => {
+                    setupEventListeners();
+                }, 100);
+            }
         });
+        
+        function setupEventListeners() {
+            // フッターの予約ボタン
+            var footerBtn = document.getElementById("footerReservationBtn");
+            if (footerBtn) {
+                footerBtn.addEventListener("click", function() {
+                    Cal("open", { calLink: "稲見駆-7zb7cf/15min" });
+                });
+            }
+            
+            // ヘッダーの予約ボタン
+            var headerBtn = document.getElementById("headerReservationBtn");
+            if (headerBtn) {
+                headerBtn.addEventListener("click", function() {
+                    Cal("open", { calLink: "稲見駆-7zb7cf/15min" });
+                });
+            }
+        }
     </script>
 </body>
 </html>
