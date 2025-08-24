@@ -9,7 +9,8 @@
     "build": "echo '静的ファイルのためビルドは不要です'",
     "serve": "http-server -p 3000 -o",
     "proxy": "node proxy-server.js",
-    "dev-full": "concurrently \"npm run start\" \"npm run proxy\""
+    "cal-api": "node cal-api-server.js",
+    "dev-full": "concurrently \"npm run start\" \"npm run proxy\" \"npm run cal-api\""
   },
   "keywords": [
     "beauty-salon",
@@ -27,7 +28,8 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.18.2",
-    "http-proxy-middleware": "^2.0.6"
+    "http-proxy-middleware": "^2.0.6",
+    "node-fetch": "^3.3.2"
   },
   "repository": {
     "type": "git",
