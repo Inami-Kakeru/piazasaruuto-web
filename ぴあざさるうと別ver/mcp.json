@@ -1,0 +1,15 @@
+{
+    "mcpServers": {
+      "supabase": {
+        "command": "python",
+        "args": [
+          "-m",
+          "supabase_mcp.main"
+        ],
+        "cwd": "./supabase-mcp-server",
+        "env": {
+          "PYTHONPATH": "./supabase-mcp-server"
+        }
+      }
+    }
+  }

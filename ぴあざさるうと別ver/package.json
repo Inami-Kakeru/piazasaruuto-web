@@ -1,0 +1,32 @@
+{
+  "name": "piazza-saluto-website",
+  "version": "1.0.0",
+  "description": "ぴあざさるうと美容室の公式ウェブサイト",
+  "main": "index.html",
+  "scripts": {
+    "start": "http-server -p 3000 -o -c-1",
+    "dev": "http-server -p 3000 -o -c-1",
+    "build": "echo '静的ファイルのためビルドは不要です'",
+    "serve": "http-server -p 3000 -o"
+  },
+  "keywords": [
+    "beauty-salon",
+    "hair-salon",
+    "reservation-system",
+    "japan",
+    "tokyo"
+  ],
+  "author": "ぴあざさるうと",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Inami-Kakeru/piazasaruuto.git"
+  },
+  "homepage": "https://github.com/Inami-Kakeru/piazasaruuto#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

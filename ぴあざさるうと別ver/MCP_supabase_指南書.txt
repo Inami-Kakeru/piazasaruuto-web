@@ -1,0 +1,329 @@
+# MCP Supabase 接続指南書
+# 再現性のあるMCPサーバーとSupabase接続手順
+
+## 目次
+1. 概要
+2. 前提条件
+3. 環境構築手順
+4. トラブルシューティング
+5. 接続テスト方法
+6. 実際の利用方法
+
+================================================================================
+## 1. 概要
+
+この指南書では、以下の構成でMCPサーバーとSupabaseを接続する手順を説明します：
+
+- **MCP Server**: Python版 supabase-mcp-server
+- **Database**: Supabase PostgreSQL
+- **Client**: Cursor IDE
+- **OS**: Windows 10/11
+
+### 最終目標
+- CursorからMCP経由でSupabaseデータベースにアクセス
+- 予約データ（id, start, attendee.email）のJSON形式での取得
+
+================================================================================
+## 2. 前提条件
+
+### 必要なソフトウェア
+- Python 3.12以上
+- Git
+- Cursor IDE
+- PowerShell
+
+### Supabaseプロジェクト情報（事前準備）
+以下の情報をSupabaseダッシュボードで確認・取得してください：
+
+1. **Project Reference**: sazeyphxijxtgetnmvdk（例）
+2. **Database Password**: 設定時のパスワード
+3. **API Keys**:
+   - anon public key
+   - service_role secret key
+4. **JWT Secret**: Settings > API > JWT Keys > CURRENT KEY
+
+================================================================================
+## 3. 環境構築手順
+
+### ステップ1: プロジェクト構造の準備
+```
+プロジェクトルート/
+├── mcp.json
+├── supabase-mcp-server/
+│   ├── .env
+│   ├── .venv/
+│   └── （その他のファイル）
+└── cal.com/（オプション）
+```
+
+### ステップ2: Python MCPサーバーのセットアップ
+
+#### 2-1. supabase-mcp-serverディレクトリに移動
+```powershell
+cd supabase-mcp-server
+```
+
+#### 2-2. 仮想環境の作成（Python 3.12）
+```powershell
+py -3.12 -m venv .venv
+```
+
+#### 2-3. 仮想環境のアクティベート
+```powershell
+.venv\Scripts\Activate.ps1
+```
+
+#### 2-4. 依存関係のインストール
+```powershell
+pip install -e .
+```
+
+### ステップ3: 環境変数の設定（.envファイル）
+
+#### 3-1. .envファイルの作成
+supabase-mcp-server/.envファイルに以下を設定：
+
+```bash
+# Supabase MCP Server Environment Configuration
+SUPABASE_PROJECT_REF=your-project-ref
+SUPABASE_DB_PASSWORD=your-database-password
+SUPABASE_REGION=ap-northeast-1
+SUPABASE_ACCESS_TOKEN=your-access-token
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+
+# TheQuery.dev API configuration
+QUERY_API_KEY=your-query-api-key
+
+# JWT Secret Keys
+SUPABASE_URL=https://your-project-ref.supabase.co
+SUPABASE_JWT_SECRET=your-jwt-secret-from-dashboard
+SUPABASE_LEGACY_JWT_SECRET=your-jwt-secret-from-dashboard
+```
+
+#### 3-2. 重要な設定項目
+
+**SUPABASE_JWT_SECRET**: 
+- SupabaseダッシュボードのSettings > API > JWT Keys
+- CURRENT KEYの値を使用
+- 形式例: d9390c59-3965-44c5-8eff-e7274500bcfb
+
+**QUERY_API_KEY**:
+- thequery.devでアカウント作成
+- APIキーを生成
+- 形式例: qry_v1_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+### ステップ4: mcp.jsonの設定
+
+プロジェクトルートにmcp.jsonを作成：
+
+```json
+{
+    "mcpServers": {
+      "supabase": {
+        "command": "python",
+        "args": [
+          "-m",
+          "supabase_mcp.main"
+        ],
+        "cwd": "./supabase-mcp-server",
+        "env": {
+          "PYTHONPATH": "./supabase-mcp-server"
+        }
+      }
+    }
+}
+```
+
+================================================================================
+## 4. トラブルシューティング
+
+### よくある問題と解決策
+
+#### 問題1: "Invalid API key"エラー
+**原因**: APIキーが正しくない、または期限切れ
+**解決策**: 
+1. Supabaseダッシュボードで最新のAPIキーを確認
+2. service_role keyの完全版をコピー
+3. .envファイルを更新
+
+#### 問題2: "ModuleNotFoundError: No module named 'supabase_mcp'"
+**原因**: 仮想環境が正しくアクティベートされていない
+**解決策**:
+1. supabase-mcp-serverディレクトリに移動
+2. .venv\Scripts\Activate.ps1を実行
+3. pip install -e .で再インストール
+
+#### 問題3: JWT Secret関連エラー
+**原因**: JWT Secretが設定されていない
+**解決策**:
+1. SupabaseダッシュボードでJWT Keys > CURRENT KEYを確認
+2. SUPABASE_JWT_SECRETに設定
+3. Legacy形式の場合はSUPABASE_LEGACY_JWT_SECRETも設定
+
+#### 問題4: .envファイルの文字化け
+**原因**: PowerShellでの文字エンコーディング問題
+**解決策**:
+```powershell
+# UTF-8エンコーディングで作成
+[System.IO.File]::WriteAllText(".env", "内容", [System.Text.Encoding]::UTF8)
+```
+
+================================================================================
+## 5. 接続テスト方法
+
+### 基本接続テスト
+
+#### 5-1. MCPサーバー起動
+```powershell
+cd supabase-mcp-server
+.venv\Scripts\Activate.ps1
+python -m supabase_mcp.main
+```
+
+#### 5-2. 別ターミナルで接続テスト
+```powershell
+python -c "
+from supabase import create_client
+url = 'https://your-project-ref.supabase.co'
+with open('.env', 'r') as f:
+    for line in f:
+        if 'SUPABASE_SERVICE_ROLE_KEY=' in line:
+            key = line.split('=')[1].strip()
+            break
+supabase = create_client(url, key)
+response = supabase.table('your_table').select('*').limit(1).execute()
+print('✅ 接続成功!')
+print(f'応答: {response.data}')
+"
+```
+
+#### 5-3. プロセス確認
+```powershell
+Get-Process | Where-Object {$_.ProcessName -like "*python*"}
+```
+
+### 予約データテスト
+
+#### サンプルデータの作成と出力
+```powershell
+python -c "
+import json
+bookings = [
+    {'id': 1, 'start': '2025-08-03T10:00:00Z', 'attendee.email': 'test1@example.com'},
+    {'id': 2, 'start': '2025-08-03T14:30:00Z', 'attendee.email': 'test2@example.com'},
+    {'id': 3, 'start': '2025-08-04T09:15:00Z', 'attendee.email': 'test3@example.com'}
+]
+print(json.dumps(bookings, indent=2, ensure_ascii=False))
+"
+```
+
+================================================================================
+## 6. 実際の利用方法
+
+### Cursorでの接続手順
+
+#### 6-1. Cursorの設定
+1. Cursorを再起動
+2. 設定 > Extensions > MCP でSupabaseサーバーが表示されることを確認
+3. 接続状態を確認
+
+#### 6-2. MCPサーバー経由での操作
+1. MCPサーバーがバックグラウンドで動作していることを確認
+2. CursorでSupabaseクエリを実行
+3. 予約データの取得・操作
+
+### バックグラウンド実行
+
+#### PowerShellでバックグラウンド起動
+```powershell
+Start-Process powershell -ArgumentList "-Command", "cd 'C:\path\to\supabase-mcp-server'; .venv\Scripts\Activate.ps1; python -m supabase_mcp.main" -WindowStyle Hidden
+```
+
+================================================================================
+## 7. チェックリスト
+
+### 環境構築完了チェック
+
+- [ ] Python 3.12がインストールされている
+- [ ] supabase-mcp-serverで仮想環境が作成されている
+- [ ] 依存関係がインストールされている（pip install -e .）
+- [ ] .envファイルが正しく設定されている
+- [ ] mcp.jsonが正しく設定されている
+- [ ] thequery.devのAPIキーが取得されている
+- [ ] Supabaseの全APIキーが最新である
+
+### 接続テスト完了チェック
+
+- [ ] MCPサーバーが起動できる
+- [ ] Supabase接続テストが成功する
+- [ ] Pythonプロセスが動作中である
+- [ ] サンプルデータが正しく出力される
+- [ ] CursorでMCPサーバーが認識される
+
+================================================================================
+## 8. 重要な注意事項
+
+### セキュリティ
+- APIキーは機密情報として管理
+- .envファイルをGitにコミットしない
+- 定期的にAPIキーを更新
+
+### パフォーマンス
+- MCPサーバーはバックグラウンドで常時動作
+- 必要に応じてプロセスを再起動
+- メモリ使用量を定期的に確認
+
+### メンテナンス
+- Supabaseプロジェクトの設定変更時は.envファイルを更新
+- Python依存関係の定期的な更新
+- MCPサーバーのログを定期的に確認
+
+================================================================================
+## 9. よく使用するコマンド集
+
+### 環境操作
+```powershell
+# 仮想環境アクティベート
+.venv\Scripts\Activate.ps1
+
+# MCPサーバー起動
+python -m supabase_mcp.main
+
+# プロセス確認
+Get-Process | Where-Object {$_.ProcessName -like "*python*"}
+
+# 環境変数確認
+Get-Content .env
+```
+
+### 接続テスト
+```powershell
+# 簡単な接続テスト
+python -c "from supabase import create_client; print('OK')"
+
+# データベース接続テスト
+python create_bookings.py
+```
+
+### トラブル対応
+```powershell
+# プロセス強制終了
+Stop-Process -Name "python*" -Force
+
+# 仮想環境再作成
+Remove-Item -Recurse -Force .venv
+py -3.12 -m venv .venv
+```
+
+================================================================================
+## 10. 更新履歴
+
+- 2025/08/03: 初版作成
+- Python 3.12対応
+- JWT Secret設定追加
+- thequery.dev API連携追加
+
+================================================================================
+
+このドキュメントは実際の接続試行を基に作成されています。
+問題が発生した場合は、トラブルシューティングセクションを参照してください。 

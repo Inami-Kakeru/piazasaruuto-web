@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ぴあざさるうと - Piazza Salute</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+    <link rel="stylesheet" href="https://app.cal.com/embed/embed.css" />
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <a href="#home" class="logo">ぴあざさるうと</a>
+            <nav class="nav" role="navigation" aria-label="メインナビゲーション">
+                <ul class="nav-list">
+                    <li><a href="#home" class="nav-link">Home</a></li>
+                    <li><a href="#about" class="nav-link">About</a></li>
+                    <li><a href="#stylist" class="nav-link">Stylist</a></li>
+                    <li><a href="#access" class="nav-link">Access</a></li>
+                    <li><a href="#instagram" class="nav-link">Instagram</a></li>
+                    <li><a href="menu.html" class="nav-link">Menu</a></li>
+                    <li><a href="/resavation/" class="nav-link">予約システム</a></li>
+                </ul>
+            </nav>
+            <div class="nav-actions">
+                <button id="headerReservationBtn" class="btn-reservation-header" aria-label="ご予約はこちら">
+                    ご予約はこちら
+                </button>
+            </div>
+            <button class="hamburger-menu" aria-label="メニューを開く" aria-expanded="false">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-image">
+            <img src="images/hero-image.jpg" alt="美容室ぴあざさるうと外観" class="hero-img">
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <h2 class="section-title">About</h2>
+            <div class="about-content">
+                <p class="about-text">
+                    世代を問わず多くの支持を集めるプライベート空間で、"もっと輝く私"に。<br>
+                    髪の悩みに寄り添い、あなたの「なりたい」を叶えるサロン
+                </p>
+                
+                <div class="about-details">
+                    <div class="detail-item">
+                        <h3>こだわり</h3>
+                        <p>髪質・骨格・ライフスタイルに合わせた<br>
+                        "扱いやすいスタイル"をご提案<br>
+                        毎朝のヘアセットが楽しくなるような髪型</p>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <h3>技術</h3>
+                        <p>TOKIOインカラミトリートメント<br>
+                        さりげないインナーカラーや白髪ぼかし<br>
+                        オーダーメイドヘアケア</p>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <h3>空間</h3>
+                        <p>完全バリアフリー設計<br>
+                        ベビーカーや車椅子でもスムーズに<br>
+                        すべての水に軟水を使用</p>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <h3>営業時間</h3>
+                        <p>月・火・水・金・土 10:00〜17:30<br>
+                        （カット最終 16:30）<br>
+                        日・木 定休日</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Menu Preview Section -->
+    <section class="menu-preview">
+        <div class="container">
+            <h2 class="section-title">Menu</h2>
+            <div class="menu-grid">
+                <div class="menu-category">
+                    <h3>カット</h3>
+                    <div class="menu-items">
+                        <div class="menu-item">
+                            <span class="item-name">カット（シャンプー・ブロー込）</span>
+                            <span class="item-price">¥5,040</span>
+                        </div>
+                        <div class="menu-item">
+                            <span class="item-name">前髪カット</span>
+                            <span class="item-price">¥1,500～</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="menu-category">
+                    <h3>カラー</h3>
+                    <div class="menu-items">
+                        <div class="menu-item">
+                            <span class="item-name">イノアオイルカラー（白髪対応）</span>
+                            <span class="item-price">¥9,880～</span>
+                        </div>
+                        <div class="menu-item">
+                            <span class="item-name">ヘナカラー（低刺激）</span>
+                            <span class="item-price">¥8,070～</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="menu-category">
+                    <h3>パーマ</h3>
+                    <div class="menu-items">
+                        <div class="menu-item">
+                            <span class="item-name">パーマ＋カット</span>
+                            <span class="item-price">¥13,000～</span>
+                        </div>
+                        <div class="menu-item">
+                            <span class="item-name">前髪ストレートパーマ</span>
+                            <span class="item-price">要問い合わせ</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="menu-category">
+                    <h3>ヘッドスパ</h3>
+                    <div class="menu-items">
+                        <div class="menu-item">
+                            <span class="item-name">カット＋ヘッドスパ</span>
+                            <span class="item-price">¥6,250</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="menu-category">
+                    <h3>トリートメント</h3>
+                    <div class="menu-items">
+                        <div class="menu-item">
+                            <span class="item-name">TOKIOインカラミトリートメント</span>
+                            <span class="item-price">¥8,100～</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="menu-category">
+                    <h3>増毛エクステ</h3>
+                    <div class="menu-items">
+                        <div class="menu-item">
+                            <span class="item-name">ボリュームアップエクステ</span>
+                            <span class="item-price">要問い合わせ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="menu-detail-link">
+                <p class="menu-detail-text">
+                    詳しい情報は、<a href="menu.html" class="menu-detail-link-text">メニュー詳細</a>をご覧ください。<br>
+                    ご不明な点がございましたら、<a href="tel:03-3978-4800" class="contact-link">ご連絡</a>くださいませ。
+                </p>
+            </div>
+            
+            
+        </div>
+    </section>
+
+    <!-- Stylist Section -->
+    <section id="stylist" class="stylist">
+        <div class="container">
+            <h2 class="section-title">Stylist</h2>
+            <div class="stylist-grid">
+                <!-- 松本 貴子 -->
+                <div class="stylist-card">
+                    <div class="stylist-photo">
+                        <img src="images/マツモトタカコ.png" alt="松本 貴子" class="profile-img">
+                    </div>
+                    <div class="stylist-info-detail">
+                        <h3>松本 貴子</h3>
+                        <p class="position">トップスタイリスト</p>
+                        <p class="experience">スタイリスト歴15年</p>
+                        <p class="catchphrase">お手入れが楽で再現しやすいスタイルを心掛けています</p>
+                        <div class="profile">
+                            <p>その人の似合うシルエットを見つけ、家でも簡単にスタイリングできるデザインを提案しています。骨格に合わせたカットが得意です。特にくせ毛の方お悩み解決致します！眉毛もケア可能です◎</p>
+                        </div>
+                        <div class="specialties">
+                            <p>得意分野：オフィス・コンサバ</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 角田 良美 -->
+                <div class="stylist-card">
+                    <div class="stylist-photo">
+                        <img src="images/カクタヨシミ.png" alt="角田 良美" class="profile-img">
+                    </div>
+                    <div class="stylist-info-detail">
+                        <h3>角田 良美</h3>
+                        <p class="position">トップスタイリスト</p>
+                        <p class="experience">スタイリスト歴15年</p>
+                        <p class="catchphrase">丁寧な接客、施術で『美』のお手伝いをさせて頂きます!</p>
+                        <div class="profile">
+                            <p>保谷生まれの保谷育ち、息子3人の母。家でも簡単にスタイリングできるデザインを提案しています。若見えデザインの提案も得意です。お気軽に相談してください。</p>
+                        </div>
+                        <div class="specialties">
+                            <p>得意分野：オフィス・コンサバ</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 中山 真美 -->
+                <div class="stylist-card">
+                    <div class="stylist-photo">
+                        <img src="images/ナカヤママミ.png" alt="中山 真美" class="profile-img">
+                    </div>
+                    <div class="stylist-info-detail">
+                        <h3>中山 真美</h3>
+                        <p class="position">オーナー / エアリーエクステ担当</p>
+                        <p class="experience">スタイリスト歴3年</p>
+                        <p class="catchphrase">美容室併設サロン</p>
+                        <div class="profile">
+                            <p>丁寧なカウンセリングを心掛けております。エクステ美容師エアリーエクステ。</p>
+                        </div>
+                        <div class="specialties">
+                            <p>得意分野：ナチュラル</p>
+                            <p>ボリュームUP、髪の割れ改善、頭皮透け改善、ふんわりヘアーをサポート</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Access Section -->
+    <section id="access" class="access">
+        <div class="container">
+            <h2 class="section-title">Access</h2>
+            <div class="access-content">
+                <div class="access-info">
+                    <div class="address">
+                        <h3>住所</h3>
+                        <p>〒178-0064<br>
+                        東京都練馬区南大泉5-35-8</p>
+                    </div>
+                    
+                    <div class="transport">
+                        <h3>アクセス</h3>
+                        <p>西武池袋線「保谷駅」北口より徒歩1分<br>
+                        北口を出て線路沿いに直進し、1本目の角を左折<br>
+                        右手にある「ほうやデンタルクリニック」の隣</p>
+                    </div>
+                    
+                    <div class="contact">
+                        <h3>お問い合わせ</h3>
+                        <p class="phone-number">📞 03-3978-4800</p>
+                        <p class="email">✉️ test@example.com</p>
+                    </div>
+                    
+                    <div class="parking">
+                        <h3>駐車場</h3>
+                        <p>あり（台数に限りがあるため、<br>
+                        事前にお電話でのご予約をお願いいたします）</p>
+                    </div>
+                </div>
+                
+                <div class="map-container">
+                    <h3 class="map-title">地図</h3>
+                    <div class="google-map">
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3238.081599976219!2d139.56598757700579!3d35.74879907256545!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6018ef2a01a8635f%3A0x99775d8eace6f824!2z44G044GC44GW44GV44KL44GG44Go!5e0!3m2!1sja!2sjp!4v1753859893981!5m2!1sja!2sjp" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Instagram Section -->
+    <section id="instagram" class="instagram">
+        <div class="container">
+            <h2 class="section-title">Instagram</h2>
+            <div class="instagram-content">
+                <div class="swiper instagram-swiper">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide">
+                            <div class="instagram-post">
+                                <div class="instagram-image">
+                                    <span>Instagram投稿1</span>
+                                </div>
+                                <div class="instagram-overlay">
+                                    <span class="instagram-icon">📷</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="instagram-post">
+                                <div class="instagram-image">
+                                    <span>Instagram投稿2</span>
+                                </div>
+                                <div class="instagram-overlay">
+                                    <span class="instagram-icon">📷</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="instagram-post">
+                                <div class="instagram-image">
+                                    <span>Instagram投稿3</span>
+                                </div>
+                                <div class="instagram-overlay">
+                                    <span class="instagram-icon">📷</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swiper-pagination"></div>
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
+                </div>
+                <div class="instagram-follow">
+                    <p>最新のスタイリングやサロンの様子をチェック！</p>
+                    <a href="#" class="instagram-link">📷 Instagramでフォロー</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h2>ぴあざさるうと</h2>
+                </div>
+                <div class="footer-info">
+                    <div class="footer-section">
+                        <h4>営業時間</h4>
+                        <p>月・火・水・金・土 10:00〜17:30<br>
+                        日・木 定休日</p>
+                    </div>
+                    <div class="footer-section">
+                        <h4>お問い合わせ</h4>
+                        <p>📞 03-3978-4800<br>
+                        ✉️ test@example.com</p>
+                    </div>
+                </div>
+                <div class="footer-reservation">
+                    <button id="footerReservationBtn" class="btn-reservation-footer" aria-label="ご予約はこちら">
+                        ご予約はこちら
+                    </button>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 ぴあざさるうと. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+        // Initialize Swiper for Instagram section
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing Swiper...');
+            
+            const swiperElement = document.querySelector('.instagram-swiper');
+            if (swiperElement) {
+                console.log('Swiper element found:', swiperElement);
+                
+                const instagramSwiper = new Swiper('.instagram-swiper', {
+                    loop: true,
+                    slidesPerView: 1.1,
+                    spaceBetween: 20,
+                    centeredSlides: true,
+                    breakpoints: {
+                        640: { 
+                            slidesPerView: 1.8,
+                            spaceBetween: 24
+                        },
+                        768: {
+                            slidesPerView: 2.2,
+                            spaceBetween: 28
+                        },
+                        1024: { 
+                            slidesPerView: 2.8,
+                            spaceBetween: 32
+                        }
+                    },
+                    autoplay: { 
+                        delay: 4000,
+                        disableOnInteraction: false,
+                        pauseOnMouseEnter: false,
+                        waitForTransition: true
+                    },
+                    pagination: { 
+                        el: '.swiper-pagination', 
+                        clickable: true,
+                        dynamicBullets: true
+                    },
+                    navigation: {
+                        nextEl: '.swiper-button-next',
+                        prevEl: '.swiper-button-prev'
+                    },
+                    effect: 'slide',
+                    speed: 800,
+                    easing: 'ease-in-out'
+                });
+                
+                console.log('Swiper initialized successfully');
+            } else {
+                console.error('Swiper element not found');
+            }
+        });
+    </script>
+    <script src="script.js"></script>
+    <script src="reservation-modal.js"></script>
+    <script src="hamburger-menu.js"></script>
+    <script src="https://app.cal.com/embed/embed.js" async></script>
+    <script>
+        // Cal.com embed initialization and trigger binding
+        window.Cal = window.Cal || function(){(Cal.q = Cal.q || []).push(arguments)};
+        Cal("init", { origin: "https://cal.com" });
+        Cal("ui", { theme: "light" });
+
+        document.addEventListener("DOMContentLoaded", function() {
+            // フッターの予約ボタン
+            var footerBtn = document.getElementById("footerReservationBtn");
+            if (footerBtn) {
+                footerBtn.addEventListener("click", function() {
+                    Cal("open", { calLink: "稲見駆-7zb7cf/15min" });
+                });
+            }
+            
+            // ヘッダーの予約ボタン
+            var headerBtn = document.getElementById("headerReservationBtn");
+            if (headerBtn) {
+                headerBtn.addEventListener("click", function() {
+                    Cal("open", { calLink: "稲見駆-7zb7cf/15min" });
+                });
+            }
+        });
+    </script>
+</body>
+</html>

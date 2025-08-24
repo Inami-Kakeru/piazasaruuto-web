@@ -1,0 +1,364 @@
+/* Menu Page Specific Styles */
+
+/* Menu Hero Section */
+.menu-hero {
+    margin-top: 70px;
+    height: 40vh;
+    overflow: hidden;
+    position: relative;
+}
+
+.menu-hero-image {
+    width: 100%;
+    height: 100%;
+}
+
+.menu-hero .hero-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.8);
+}
+
+/* Page Title */
+.page-title {
+    font-size: 48px;
+    font-weight: 300;
+    text-align: center;
+    margin: 60px 0 30px;
+    letter-spacing: 3px;
+    color: #333;
+}
+
+.menu-description {
+    text-align: center;
+    font-size: 16px;
+    line-height: 1.8;
+    color: #666;
+    margin-bottom: 80px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Menu Main Section */
+.menu-main {
+    padding: 40px 0 80px;
+    background-color: #fff;
+}
+
+/* Menu Sections */
+.menu-section {
+    margin-bottom: 80px;
+}
+
+.menu-category-title {
+    font-size: 32px;
+    font-weight: 400;
+    text-align: center;
+    margin-bottom: 40px;
+    color: #333;
+    position: relative;
+    padding-bottom: 15px;
+}
+
+.menu-category-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 2px;
+    background-color: #8B7355;
+}
+
+/* Menu Items Grid */
+.menu-items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+/* Menu Item Cards */
+.menu-item-card {
+    background-color: #fafafa;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    border: 1px solid #f0f0f0;
+}
+
+.menu-item-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.menu-item-card.featured {
+    background: linear-gradient(135deg, #8B7355 0%, #A68B5B 100%);
+    color: white;
+    border: none;
+}
+
+.menu-item-card.featured .item-title,
+.menu-item-card.featured .item-description {
+    color: white;
+}
+
+.item-title {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.item-description {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.item-price {
+    font-size: 20px;
+    font-weight: 600;
+    color: #8B7355;
+    text-align: right;
+}
+
+.menu-item-card.featured .item-price {
+    color: white;
+}
+
+/* Price Styling for Set Menu */
+.original-price {
+    font-size: 16px;
+    text-decoration: line-through;
+    color: #999;
+    margin-right: 10px;
+}
+
+.menu-item-card.featured .original-price {
+    color: rgba(255,255,255,0.7);
+}
+
+.sale-price {
+    font-size: 22px;
+    font-weight: 700;
+    color: #8B7355;
+}
+
+.menu-item-card.featured .sale-price {
+    color: #FFD700;
+}
+
+/* Set Menu Description */
+.set-menu-description {
+    text-align: center;
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 30px;
+    font-style: italic;
+}
+
+/* Booking Info Section */
+.booking-info {
+    background-color: #f8f8f8;
+    padding: 50px;
+    border-radius: 15px;
+    margin-top: 60px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.booking-info h2 {
+    font-size: 28px;
+    font-weight: 400;
+    text-align: center;
+    margin-bottom: 40px;
+    color: #333;
+}
+
+.booking-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.booking-item {
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.booking-item h3 {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.booking-item p {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.booking-hours,
+.booking-note {
+    font-size: 12px;
+    color: #999;
+    font-style: italic;
+}
+
+/* Booking Notes */
+.booking-notes {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    border-left: 4px solid #8B7355;
+}
+
+.booking-notes h3 {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.booking-notes ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.booking-notes li {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #666;
+    margin-bottom: 10px;
+    padding-left: 20px;
+    position: relative;
+}
+
+.booking-notes li:before {
+    content: "•";
+    color: #8B7355;
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+}
+
+/* Active Navigation Link */
+.nav-link.active {
+    color: #8B7355;
+    font-weight: 500;
+}
+
+/* Responsive Design for Menu Page */
+@media (max-width: 768px) {
+    .page-title {
+        font-size: 36px;
+        margin: 40px 0 20px;
+    }
+    
+    .menu-description {
+        font-size: 14px;
+        margin-bottom: 50px;
+        padding: 0 20px;
+    }
+    
+    .menu-category-title {
+        font-size: 24px;
+        margin-bottom: 30px;
+    }
+    
+    .menu-items-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .menu-item-card {
+        padding: 20px;
+    }
+    
+    .booking-info {
+        padding: 30px 20px;
+        margin-top: 40px;
+    }
+    
+    .booking-details {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .booking-item {
+        padding: 20px;
+    }
+    
+    .booking-notes {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .menu-hero {
+        height: 30vh;
+    }
+    
+    .page-title {
+        font-size: 28px;
+    }
+    
+    .menu-category-title {
+        font-size: 20px;
+    }
+    
+    .item-title {
+        font-size: 16px;
+    }
+    
+    .item-price {
+        font-size: 18px;
+    }
+    
+    .booking-info h2 {
+        font-size: 22px;
+    }
+}
+
+/* Animation Effects */
+.menu-item-card {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+.menu-item-card:nth-child(1) { animation-delay: 0.1s; }
+.menu-item-card:nth-child(2) { animation-delay: 0.2s; }
+.menu-item-card:nth-child(3) { animation-delay: 0.3s; }
+.menu-item-card:nth-child(4) { animation-delay: 0.4s; }
+.menu-item-card:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Loading State */
+.menu-main {
+    opacity: 0;
+    animation: fadeIn 0.8s ease forwards;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+

@@ -1,0 +1,24 @@
+# 認証設定
+NEXTAUTH_SECRET=1uNfajifjafojaofjaofjoaj
+NEXTAUTH_URL=http://localhost:3000
+
+# Supabase PostgreSQL接続情報
+DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@db.YOUR_PROJECT_REF.supabase.co:5432/postgres
+
+# Cal.com設定
+CALCOM_TELEMETER_DISABLED=1
+NEXT_PUBLIC_WEBAPP_URL=http://localhost:3000
+NEXT_PUBLIC_WEBSITE_URL=http://localhost:3000
+
+# メール設定（ローカル用。MailhogやMailtrap用）
+EMAIL_SERVER_HOST=localhost
+EMAIL_SERVER_PORT=1025
+EMAIL_SERVER_USER=
+EMAIL_SERVER_PASSWORD=
+EMAIL_FROM=your@email.com
+
+# データ暗号化キー
+ENCRYPTION_KEY=fnsifjiajfoajfoajofjaojfaof
+
+# 実行環境
+NODE_ENV=development 
