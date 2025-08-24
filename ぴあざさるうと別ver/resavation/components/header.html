@@ -183,9 +183,20 @@ document.addEventListener("DOMContentLoaded", function() {
     const headerBtn = document.getElementById("headerReservationBtn");
     if (headerBtn) {
         headerBtn.addEventListener("click", function() {
-            // 直接booking.htmlに移動
-            console.log('Navigating to: resavation/booking.html');
-            window.location.href = 'resavation/booking.html';
+            // 現在のページの場所に応じて適切なパスを決定
+            const currentPath = window.location.pathname;
+            let bookingPath;
+            
+            if (currentPath.includes('/resavation/')) {
+                // resavationフォルダ内のページからの場合
+                bookingPath = './booking.html';
+            } else {
+                // ルートディレクトリのページからの場合
+                bookingPath = './resavation/booking.html';
+            }
+            
+            console.log('Navigating to:', bookingPath);
+            window.location.href = bookingPath;
         });
     }
 });

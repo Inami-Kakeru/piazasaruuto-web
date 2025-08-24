@@ -382,23 +382,42 @@
         document.addEventListener("DOMContentLoaded", function() {
             console.log('DOM loaded, checking components...');
             
-            // コンポーネントローダーが利用可能かチェック
-            if (window.ComponentLoader) {
-                console.log('ComponentLoader found, loading components...');
-                // 手動でコンポーネントを読み込み
-                ComponentLoader.loadAllComponents().then(() => {
-                    console.log('All components loaded, setting up event listeners...');
-                    setupEventListeners();
-                }).catch(error => {
-                    console.error('Error loading components:', error);
+            // コンポーネントローダーの読み込み完了を待つ
+            function waitForComponentLoader() {
+                return new Promise((resolve) => {
+                    if (window.ComponentLoader) {
+                        resolve();
+                    } else {
+                        setTimeout(() => {
+                            if (window.ComponentLoader) {
+                                resolve();
+                            } else {
+                                console.warn('ComponentLoader still not available, continuing anyway...');
+                                resolve();
+                            }
+                        }, 500);
+                    }
                 });
-            } else {
-                console.error('ComponentLoader not found');
-                // フォールバック: 直接コンポーネントを読み込み
-                setTimeout(() => {
-                    setupEventListeners();
-                }, 100);
             }
+            
+            waitForComponentLoader().then(() => {
+                if (window.ComponentLoader) {
+                    console.log('ComponentLoader found, loading components...');
+                    // 手動でコンポーネントを読み込み
+                    ComponentLoader.loadAllComponents().then(() => {
+                        console.log('All components loaded, setting up event listeners...');
+                        setupEventListeners();
+                    }).catch(error => {
+                        console.error('Error loading components:', error);
+                        // エラーでも一度イベントリスナーを設定してみる
+                        setTimeout(setupEventListeners, 1000);
+                    });
+                } else {
+                    console.error('ComponentLoader not found after waiting');
+                    // フォールバック: 直接イベントリスナーを設定
+                    setTimeout(setupEventListeners, 1000);
+                }
+            });
         });
         
         function setupEventListeners() {
@@ -414,7 +433,8 @@
             var headerBtn = document.getElementById("headerReservationBtn");
             if (headerBtn) {
                 headerBtn.addEventListener("click", function() {
-                    Cal("open", { calLink: "稲見駆-7zb7cf/15min" });
+                    // booking.htmlに移動
+                    window.location.href = "resavation/booking.html";
                 });
             }
         }
