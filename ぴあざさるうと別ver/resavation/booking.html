@@ -9,6 +9,7 @@
   <meta name="format-detection" content="telephone=no" />
 
   <script src="../components/component-loader.js"></script>
+  <script src="../config.js"></script>
   <style>
     /* Reset and Base Styles */
     * {
@@ -199,8 +200,8 @@
 
     /* Main Content */
     main {
-      padding-top: 120px;
-      min-height: calc(100vh - 120px);
+      padding-top: 140px;
+      min-height: calc(100vh - 140px);
     }
 
     /* Back Button */
@@ -384,12 +385,12 @@
 
     /* Custom Calendar Widget */
     .cal-widget-container {
-      margin-bottom: 30px;
+      margin: 40px 0 30px 0;
       border: 1px solid var(--border);
       border-radius: 12px;
       overflow: hidden;
       background-color: var(--white);
-      padding: 20px;
+      padding: 30px;
     }
 
     .calendar-header {
@@ -988,16 +989,88 @@
     let currentStep = 1;
     let bookingData = {};
 
+    // Cal.com API Configuration
+    const CAL_API_CONFIG = {
+      base: window.CAL_CONFIG?.CAL_API_BASE || 'https://api.cal.com',
+      key: window.CAL_CONFIG?.CAL_API_KEY || 'cal_test_xxxxxxxxxxxxxxxxxxxxxxxxx',
+      version: window.CAL_CONFIG?.CAL_API_VERSION || 'v2',
+      eventTypeId: window.CAL_CONFIG?.EVENT_TYPE_ID || '稲見駆-7zb7cf/15min'
+    };
+
     // Calendar variables
     let currentDate = new Date();
     let selectedDate = null;
     let selectedTime = null;
+    let availableSlots = [];
 
     // Initialize calendar
     document.addEventListener('DOMContentLoaded', function() {
       renderCalendar();
       generateTimeSlots();
+      
+      // Load environment variables if available
+      loadEnvironmentVariables();
     });
+
+    // Load environment variables from .env (if accessible)
+    async function loadEnvironmentVariables() {
+      try {
+        // Try to load from a config endpoint or use default values
+        const response = await fetch('/api/config');
+        if (response.ok) {
+          const config = await response.json();
+          Object.assign(CAL_API_CONFIG, config);
+        }
+      } catch (error) {
+        console.log('Using default Cal.com API configuration');
+      }
+    }
+
+    // Fetch available slots from Cal.com API
+    async function fetchAvailableSlots(date) {
+      try {
+        const formattedDate = date.toISOString().split('T')[0];
+        const url = `${CAL_API_CONFIG.base}/${CAL_API_CONFIG.version}/availability?dateFrom=${formattedDate}&dateTo=${formattedDate}&eventTypeId=${CAL_API_CONFIG.eventTypeId}`;
+        
+        const response = await fetch(url, {
+          headers: {
+            'Authorization': `Bearer ${CAL_API_CONFIG.key}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          return data.availableSlots || [];
+        } else {
+          console.error('Failed to fetch available slots:', response.statusText);
+          return [];
+        }
+      } catch (error) {
+        console.error('Error fetching available slots:', error);
+        // Fallback to simulated availability
+        return generateSimulatedSlots(date);
+      }
+    }
+
+    // Generate simulated slots for fallback
+    function generateSimulatedSlots(date) {
+      const dayOfWeek = date.getDay();
+      const slots = [];
+      
+      // Business hours: 10:00-17:30 (Mon, Tue, Wed, Fri, Sat)
+      if (dayOfWeek !== 0 && dayOfWeek !== 4) {
+        for (let hour = 10; hour <= 17; hour++) {
+          if (hour === 12) continue; // Skip lunch hour
+          slots.push(`${hour.toString().padStart(2, '0')}:00`);
+          if (hour < 17) {
+            slots.push(`${hour.toString().padStart(2, '0')}:30`);
+          }
+        }
+      }
+      
+      return slots;
+    }
 
     // Render calendar
     function renderCalendar() {
@@ -1068,7 +1141,7 @@
     }
 
     // Select date
-    function selectDate(date) {
+    async function selectDate(date) {
       // Remove previous selection
       document.querySelectorAll('.calendar-day.selected').forEach(day => {
         day.classList.remove('selected');
@@ -1082,6 +1155,9 @@
       
       // Show time slots
       document.getElementById('timeSlots').style.display = 'block';
+      
+      // Fetch available slots from Cal.com API
+      availableSlots = await fetchAvailableSlots(date);
       
       // Update time slots availability
       updateTimeSlots(date);
@@ -1117,11 +1193,13 @@
         const time = slot.textContent;
         slot.classList.remove('selected', 'unavailable');
         
-        // Simulate availability check
-        if (isTimeAvailable(date, time)) {
+        // Check if time is available from API data
+        if (availableSlots.includes(time)) {
           slot.style.display = 'block';
+          slot.classList.remove('unavailable');
         } else {
           slot.style.display = 'none';
+          slot.classList.add('unavailable');
         }
       });
     }
