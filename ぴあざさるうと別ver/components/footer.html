@@ -1,0 +1,185 @@
+<!-- Footer Component -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <h2>ぴあざさるうと</h2>
+            </div>
+            <div class="footer-info">
+                <div class="footer-section">
+                    <h4>営業時間</h4>
+                    <p>月・火・水・金・土 10:00〜17:30<br>
+                    日・木 定休日</p>
+                </div>
+                <div class="footer-section">
+                    <h4>お問い合わせ</h4>
+                    <p>📞 03-3978-4800<br>
+                    ✉️ test@example.com</p>
+                </div>
+            </div>
+            <div class="footer-reservation">
+                <button id="footerReservationBtn" class="btn-reservation-footer" aria-label="ご予約はこちら">
+                    ご予約はこちら
+                </button>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; <span id="currentYear"></span> ぴあざさるうと. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<!-- Footer Styles -->
+<style>
+.footer {
+    background-color: #f8f8f8;
+    border-top: 2px solid #d4c5b9;
+    padding: 40px 0 20px;
+    margin-top: 60px;
+}
+
+.footer .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 40px;
+    align-items: start;
+    margin-bottom: 30px;
+}
+
+.footer-logo h2 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 24px;
+    font-weight: 400;
+    letter-spacing: 3px;
+    color: #5c4b3e;
+    margin: 0;
+}
+
+.footer-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+}
+
+.footer-section h4 {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: #5c4b3e;
+    margin: 0 0 12px 0;
+    letter-spacing: 1px;
+}
+
+.footer-section p {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #666;
+    margin: 0;
+}
+
+.footer-reservation {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-reservation-footer {
+    background-color: #a8c9a8;
+    color: #5c4b3e;
+    border: none;
+    border-radius: 50px;
+    padding: 16px 32px;
+    font-weight: 600;
+    font-size: 16px;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+    letter-spacing: 1px;
+    white-space: nowrap;
+}
+
+.btn-reservation-footer:hover {
+    background-color: #8bb88b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(168, 201, 168, 0.3);
+}
+
+.footer-bottom {
+    border-top: 1px solid #e0e0e0;
+    padding-top: 20px;
+    text-align: center;
+}
+
+.footer-bottom p {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 12px;
+    color: #999;
+    margin: 0;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 30px;
+        text-align: center;
+    }
+    
+    .footer-info {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .footer-logo h2 {
+        font-size: 20px;
+        letter-spacing: 2px;
+    }
+    
+    .footer-section h4 {
+        font-size: 15px;
+    }
+    
+    .footer-section p {
+        font-size: 13px;
+    }
+    
+    .btn-reservation-footer {
+        padding: 14px 28px;
+        font-size: 15px;
+    }
+}
+</style>
+
+<!-- Footer Scripts -->
+<script>
+// Footer reservation button functionality
+document.addEventListener("DOMContentLoaded", function() {
+    const footerBtn = document.getElementById("footerReservationBtn");
+    if (footerBtn) {
+        footerBtn.addEventListener("click", function() {
+            // Check if Cal.com is available
+            if (window.Cal) {
+                Cal("open", { calLink: "稲見駆-7zb7cf/15min" });
+            } else {
+                // Fallback to direct link
+                window.location.href = "/resavation/booking.html";
+            }
+        });
+    }
+    
+    // Set current year
+    const yearSpan = document.getElementById("currentYear");
+    if (yearSpan) {
+        yearSpan.textContent = new Date().getFullYear();
+    }
+});
+</script>

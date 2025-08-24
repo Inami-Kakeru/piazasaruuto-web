@@ -7,35 +7,11 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
     <link rel="stylesheet" href="https://app.cal.com/embed/embed.css" />
+    <script src="components/component-loader.js"></script>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <a href="#home" class="logo">ぴあざさるうと</a>
-            <nav class="nav" role="navigation" aria-label="メインナビゲーション">
-                <ul class="nav-list">
-                    <li><a href="#home" class="nav-link">Home</a></li>
-                    <li><a href="#about" class="nav-link">About</a></li>
-                    <li><a href="#stylist" class="nav-link">Stylist</a></li>
-                    <li><a href="#access" class="nav-link">Access</a></li>
-                    <li><a href="#instagram" class="nav-link">Instagram</a></li>
-                    <li><a href="menu.html" class="nav-link">Menu</a></li>
-                    <li><a href="/resavation/booking.html" class="nav-link">予約システム</a></li>
-                </ul>
-            </nav>
-            <div class="nav-actions">
-                <button id="headerReservationBtn" class="btn-reservation-header" aria-label="ご予約はこちら">
-                    ご予約はこちら
-                </button>
-            </div>
-            <button class="hamburger-menu" aria-label="メニューを開く" aria-expanded="false">
-                <span class="hamburger-line"></span>
-                <span class="hamburger-line"></span>
-                <span class="hamburger-line"></span>
-            </button>
-        </div>
-    </header>
+    <!-- Header Component -->
+    <div data-component="header"></div>
 
     <!-- Hero Section -->
     <section id="home" class="hero">
@@ -334,36 +310,8 @@
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-logo">
-                    <h2>ぴあざさるうと</h2>
-                </div>
-                <div class="footer-info">
-                    <div class="footer-section">
-                        <h4>営業時間</h4>
-                        <p>月・火・水・金・土 10:00〜17:30<br>
-                        日・木 定休日</p>
-                    </div>
-                    <div class="footer-section">
-                        <h4>お問い合わせ</h4>
-                        <p>📞 03-3978-4800<br>
-                        ✉️ test@example.com</p>
-                    </div>
-                </div>
-                <div class="footer-reservation">
-                    <button id="footerReservationBtn" class="btn-reservation-footer" aria-label="ご予約はこちら">
-                        ご予約はこちら
-                    </button>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2024 ぴあざさるうと. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
+    <!-- Footer Component -->
+    <div data-component="footer"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
@@ -430,22 +378,26 @@
         Cal("init", { origin: "https://cal.com" });
         Cal("ui", { theme: "light" });
 
+        // コンポーネントが読み込まれた後の処理
         document.addEventListener("DOMContentLoaded", function() {
-            // フッターの予約ボタン
-            var footerBtn = document.getElementById("footerReservationBtn");
-            if (footerBtn) {
-                footerBtn.addEventListener("click", function() {
-                    Cal("open", { calLink: "稲見駆-7zb7cf/15min" });
-                });
-            }
-            
-            // ヘッダーの予約ボタン
-            var headerBtn = document.getElementById("headerReservationBtn");
-            if (headerBtn) {
-                headerBtn.addEventListener("click", function() {
-                    Cal("open", { calLink: "稲見駆-7zb7cf/15min" });
-                });
-            }
+            // コンポーネントの読み込み完了を待つ
+            setTimeout(() => {
+                // フッターの予約ボタン
+                var footerBtn = document.getElementById("footerReservationBtn");
+                if (footerBtn) {
+                    footerBtn.addEventListener("click", function() {
+                        Cal("open", { calLink: "稲見駆-7zb7cf/15min" });
+                    });
+                }
+                
+                // ヘッダーの予約ボタン
+                var headerBtn = document.getElementById("headerReservationBtn");
+                if (headerBtn) {
+                    headerBtn.addEventListener("click", function() {
+                        Cal("open", { calLink: "稲見駆-7zb7cf/15min" });
+                    });
+                }
+            }, 100);
         });
     </script>
 </body>

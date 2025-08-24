@@ -7,6 +7,7 @@
   <title>ぴあざさるうと｜オンライン予約</title>
   <meta name="description" content="ぴあざさるうとのオンライン予約システム。簡単・便利な予約で、あなたのスタイルをサポートします。" />
   <meta name="format-detection" content="telephone=no" />
+  <script src="../components/component-loader.js"></script>
   <style>
     /* Reset and Base Styles */
     * {
@@ -580,23 +581,8 @@
   </style>
 </head>
 <body>
-  <!-- Header -->
-  <header>
-    <div class="container nav">
-      <a class="brand" href="/">
-        <span class="brand-logo"></span>
-        <span class="brand-name">ぴあざさるうと</span>
-      </a>
-      <nav class="nav-links">
-        <a href="/">ホーム</a>
-        <a href="/#about">About</a>
-        <a href="/#stylist">Stylist</a>
-        <a href="/#access">Access</a>
-        <a href="/resavation/">予約システム</a>
-        <a class="btn btn-success" href="/resavation/booking">予約する</a>
-      </nav>
-    </div>
-  </header>
+  <!-- Header Component -->
+  <div data-component="header"></div>
 
   <main class="container">
     <!-- Back Button -->
