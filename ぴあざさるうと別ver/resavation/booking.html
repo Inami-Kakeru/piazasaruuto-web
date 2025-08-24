@@ -7,6 +7,7 @@
   <title>ぴあざさるうと｜オンライン予約</title>
   <meta name="description" content="ぴあざさるうとのオンライン予約システム。簡単・便利な予約で、あなたのスタイルをサポートします。" />
   <meta name="format-detection" content="telephone=no" />
+  <link rel="stylesheet" href="https://app.cal.com/embed/embed.css" />
   <script src="../components/component-loader.js"></script>
   <style>
     /* Reset and Base Styles */
@@ -381,36 +382,69 @@
       color: var(--gray);
     }
 
-    /* Date Time Selection */
-    .date-time-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
+    /* Cal.com Calendar Widget */
+    .cal-widget-container {
       margin-bottom: 30px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      background-color: var(--white);
     }
 
-    .date-picker, .time-picker {
+    #cal-widget {
+      min-height: 400px;
+    }
+
+    /* Selected Date Time Display */
+    .selected-datetime {
+      background-color: rgba(168, 201, 168, 0.1);
+      border: 2px solid var(--secondary);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .selected-datetime h3 {
+      color: var(--dark);
+      margin-bottom: 15px;
+      font-size: 18px;
+    }
+
+    .datetime-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .datetime-item {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 5px;
     }
 
-    .date-picker label, .time-picker label {
+    .datetime-item .label {
       font-weight: 600;
       color: var(--dark);
+      font-size: 14px;
     }
 
-    .date-picker input, .time-picker select {
-      padding: 12px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-size: 16px;
-      font-family: inherit;
+    .datetime-item .value {
+      color: var(--secondary);
+      font-size: 18px;
+      font-weight: 600;
     }
 
-    .date-picker input:focus, .time-picker select:focus {
-      outline: none;
-      border-color: var(--primary);
+    /* Responsive adjustments for Cal.com widget */
+    @media (max-width: 768px) {
+      .datetime-info {
+        grid-template-columns: 1fr;
+        gap: 15px;
+      }
+      
+      #cal-widget {
+        min-height: 350px;
+      }
     }
 
     /* Staff Selection */
@@ -656,36 +690,30 @@
     <!-- Step 2: Date Time Selection -->
     <div class="form-section" id="dateTimeSection" style="display: none;">
       <h2 class="section-title">日時を選択してください</h2>
-      <div class="date-time-grid">
-        <div class="date-picker">
-          <label for="date">日付</label>
-          <input type="date" id="date" min="" required>
-        </div>
-        <div class="time-picker">
-          <label for="time">時間</label>
-          <select id="time" required>
-            <option value="">時間を選択</option>
-            <option value="10:00">10:00</option>
-            <option value="10:30">10:30</option>
-            <option value="11:00">11:00</option>
-            <option value="11:30">11:30</option>
-            <option value="12:00">12:00</option>
-            <option value="12:30">12:30</option>
-            <option value="13:00">13:00</option>
-            <option value="13:30">13:30</option>
-            <option value="14:00">14:00</option>
-            <option value="14:30">14:30</option>
-            <option value="15:00">15:00</option>
-            <option value="15:30">15:30</option>
-            <option value="16:00">16:00</option>
-            <option value="16:30">16:30</option>
-            <option value="17:00">17:00</option>
-          </select>
+      
+      <!-- Cal.com Calendar Widget -->
+      <div class="cal-widget-container">
+        <div id="cal-widget" data-cal-link="稲見駆-7zb7cf/15min"></div>
+      </div>
+      
+      <!-- Selected Date Time Display -->
+      <div class="selected-datetime" id="selectedDateTime" style="display: none;">
+        <h3>選択された日時</h3>
+        <div class="datetime-info">
+          <div class="datetime-item">
+            <span class="label">日付:</span>
+            <span class="value" id="selectedDate">-</span>
+          </div>
+          <div class="datetime-item">
+            <span class="label">時間:</span>
+            <span class="value" id="selectedTime">-</span>
+          </div>
         </div>
       </div>
+      
       <div class="form-navigation">
         <button class="btn btn-secondary nav-btn" onclick="prevStep()">戻る</button>
-        <button class="btn btn-primary nav-btn" onclick="nextStep()">次へ</button>
+        <button class="btn btn-primary nav-btn" onclick="nextStep()" id="nextStepBtn" disabled>次へ</button>
       </div>
     </div>
 
@@ -779,11 +807,100 @@
     let currentStep = 1;
     let bookingData = {};
 
-    // 日付の最小値を今日に設定
+    // Cal.com initialization
     document.addEventListener('DOMContentLoaded', function() {
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById('date').min = today;
+      // Initialize Cal.com widget
+      if (window.Cal) {
+        initializeCalWidget();
+      } else {
+        // Load Cal.com script if not available
+        const script = document.createElement('script');
+        script.src = 'https://app.cal.com/embed/embed.js';
+        script.async = true;
+        script.onload = function() {
+          initializeCalWidget();
+        };
+        document.head.appendChild(script);
+      }
     });
+
+    // Initialize Cal.com widget
+    function initializeCalWidget() {
+      Cal("init", { origin: "https://cal.com" });
+      Cal("ui", { 
+        theme: "light",
+        styles: {
+          branding: { brandColor: "#a8c9a8" }
+        }
+      });
+      
+      // Listen for Cal.com events
+      Cal("on", {
+        "cal:eventTypeSelected": handleEventTypeSelected,
+        "cal:dateSelected": handleDateSelected,
+        "cal:timeSelected": handleTimeSelected,
+        "cal:bookingConfirmed": handleBookingConfirmed
+      });
+    }
+
+    // Handle event type selection
+    function handleEventTypeSelected(event) {
+      console.log('Event type selected:', event);
+    }
+
+    // Handle date selection
+    function handleDateSelected(event) {
+      console.log('Date selected:', event);
+      const selectedDate = event.detail.date;
+      document.getElementById('selectedDate').textContent = formatDate(selectedDate);
+      updateSelectedDateTime();
+    }
+
+    // Handle time selection
+    function handleTimeSelected(event) {
+      console.log('Time selected:', event);
+      const selectedTime = event.detail.time;
+      document.getElementById('selectedTime').textContent = selectedTime;
+      updateSelectedDateTime();
+    }
+
+    // Handle booking confirmation
+    function handleBookingConfirmed(event) {
+      console.log('Booking confirmed:', event);
+      // Extract date and time from Cal.com event
+      if (event.detail && event.detail.dateTime) {
+        const dateTime = new Date(event.detail.dateTime);
+        bookingData.date = dateTime.toISOString().split('T')[0];
+        bookingData.time = dateTime.toTimeString().split(' ')[0].substring(0, 5);
+        updateSelectedDateTime();
+      }
+    }
+
+    // Update selected date time display
+    function updateSelectedDateTime() {
+      const selectedDate = document.getElementById('selectedDate').textContent;
+      const selectedTime = document.getElementById('selectedTime').textContent;
+      
+      if (selectedDate !== '-' && selectedTime !== '-') {
+        document.getElementById('selectedDateTime').style.display = 'block';
+        document.getElementById('nextStepBtn').disabled = false;
+        
+        // Update booking data
+        bookingData.date = selectedDate;
+        bookingData.time = selectedTime;
+      }
+    }
+
+    // Format date for display
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('ja-JP', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        weekday: 'long'
+      });
+    }
 
     // メニュー選択
     document.querySelectorAll('.menu-item').forEach(item => {
@@ -813,7 +930,7 @@
         alert('メニューを選択してください');
         return;
       }
-      if (currentStep === 2 && (!document.getElementById('date').value || !document.getElementById('time').value)) {
+      if (currentStep === 2 && (!bookingData.date || !bookingData.time)) {
         alert('日時を選択してください');
         return;
       }
@@ -873,20 +990,16 @@
 
     // 確認データの更新
     function updateConfirmation() {
-      const date = document.getElementById('date').value;
-      const time = document.getElementById('time').value;
       const name = document.getElementById('name').value;
       const phone = document.getElementById('phone').value;
 
       document.getElementById('confirmMenu').textContent = bookingData.menuName;
-      document.getElementById('confirmDateTime').textContent = `${date} ${time}`;
+      document.getElementById('confirmDateTime').textContent = `${bookingData.date} ${bookingData.time}`;
       document.getElementById('confirmStaff').textContent = bookingData.staffName;
       document.getElementById('confirmName').textContent = name;
       document.getElementById('confirmPhone').textContent = phone;
 
       // 予約データに追加
-      bookingData.date = date;
-      bookingData.time = time;
       bookingData.customerName = name;
       bookingData.customerPhone = phone;
       bookingData.customerEmail = document.getElementById('email').value;
