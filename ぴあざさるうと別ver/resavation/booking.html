@@ -1010,11 +1010,27 @@
 
     // Initialize calendar
     document.addEventListener('DOMContentLoaded', function() {
+      console.log('🚀 Calendar initialization started');
+      
+      // Check if config is loaded
+      if (window.CAL_CONFIG) {
+        console.log('✅ CAL_CONFIG loaded:', {
+          base: window.CAL_CONFIG.CAL_API_BASE,
+          key: window.CAL_CONFIG.CAL_API_KEY ? 'Loaded' : 'Not loaded',
+          version: window.CAL_CONFIG.CAL_API_VERSION,
+          eventTypeId: window.CAL_CONFIG.EVENT_TYPE_ID
+        });
+      } else {
+        console.warn('⚠️ CAL_CONFIG not found, using default values');
+      }
+      
       renderCalendar();
       generateTimeSlots();
       
       // Load environment variables if available
       loadEnvironmentVariables();
+      
+      console.log('🚀 Calendar initialization completed');
     });
 
     // Load environment variables from .env (if accessible)
@@ -1035,24 +1051,69 @@
     async function fetchAvailableSlots(date) {
       try {
         const formattedDate = date.toISOString().split('T')[0];
-        const url = `${CAL_API_CONFIG.base}/${CAL_API_CONFIG.version}/availability?dateFrom=${formattedDate}&dateTo=${formattedDate}&eventTypeId=${CAL_API_CONFIG.eventTypeId}`;
         
-        const response = await fetch(url, {
+        // 1. 利用可能な時間を取得
+        const availabilityUrl = `${CAL_API_CONFIG.base}/${CAL_API_CONFIG.version}/availability?dateFrom=${formattedDate}&dateTo=${formattedDate}&eventTypeId=${CAL_API_CONFIG.eventTypeId}`;
+        
+        console.log('🔍 Fetching available slots from:', availabilityUrl);
+        console.log('🔑 Using API key:', CAL_API_CONFIG.key.substring(0, 10) + '...');
+        
+        const availabilityResponse = await fetch(availabilityUrl, {
           headers: {
             'Authorization': `Bearer ${CAL_API_CONFIG.key}`,
             'Content-Type': 'application/json'
           }
         });
 
-        if (response.ok) {
-          const data = await response.json();
-          return data.availableSlots || [];
+        console.log('📡 Availability API Response status:', availabilityResponse.status);
+
+        if (availabilityResponse.ok) {
+          const availabilityData = await availabilityResponse.json();
+          console.log('✅ Availability API Response data:', availabilityData);
+          
+          // 2. 既存の予約を取得して重複を除外
+          const bookingsUrl = `${CAL_API_CONFIG.base}/${CAL_API_CONFIG.version}/bookings?dateFrom=${formattedDate}&dateTo=${formattedDate}&eventTypeId=${CAL_API_CONFIG.eventTypeId}`;
+          
+          console.log('🔍 Fetching existing bookings from:', bookingsUrl);
+          
+          const bookingsResponse = await fetch(bookingsUrl, {
+            headers: {
+              'Authorization': `Bearer ${CAL_API_CONFIG.key}`,
+              'Content-Type': 'application/json'
+            }
+          });
+
+          if (bookingsResponse.ok) {
+            const bookingsData = await bookingsResponse.json();
+            console.log('📅 Existing bookings:', bookingsData);
+            
+            // 既存の予約時間を除外
+            const availableSlots = availabilityData.availableSlots || [];
+            const existingBookings = bookingsData.bookings || [];
+            
+            const conflictingTimes = existingBookings.map(booking => {
+              const startTime = new Date(booking.startTime);
+              return startTime.toTimeString().slice(0, 5); // HH:MM形式
+            });
+            
+            console.log('⏰ Conflicting times:', conflictingTimes);
+            
+            const finalAvailableSlots = availableSlots.filter(time => !conflictingTimes.includes(time));
+            console.log('✅ Final available slots (excluding conflicts):', finalAvailableSlots);
+            
+            return finalAvailableSlots;
+          } else {
+            console.log('⚠️ Could not fetch existing bookings, using availability data only');
+            return availabilityData.availableSlots || [];
+          }
         } else {
-          console.error('Failed to fetch available slots:', response.statusText);
+          const errorText = await availabilityResponse.text();
+          console.error('❌ Failed to fetch available slots:', availabilityResponse.status, availabilityResponse.statusText);
+          console.error('❌ Error details:', errorText);
           return [];
         }
       } catch (error) {
-        console.error('Error fetching available slots:', error);
+        console.error('❌ Network error fetching available slots:', error);
         // Fallback to simulated availability
         return generateSimulatedSlots(date);
       }
@@ -1063,6 +1124,8 @@
       const dayOfWeek = date.getDay();
       const slots = [];
       
+      console.log('🔄 Using fallback simulated slots for', date.toDateString());
+      
       // Business hours: 10:00-17:30 (Mon, Tue, Wed, Fri, Sat)
       if (dayOfWeek !== 0 && dayOfWeek !== 4) {
         for (let hour = 10; hour <= 17; hour++) {
@@ -1072,10 +1135,29 @@
             slots.push(`${hour.toString().padStart(2, '0')}:30`);
           }
         }
+        
+        // ランダムに一部の時間を予約済みとして除外（テスト用）
+        const randomExcludedTimes = [];
+        if (slots.length > 0) {
+          const excludeCount = Math.floor(Math.random() * 3) + 1; // 1-3個の時間を除外
+          for (let i = 0; i < excludeCount; i++) {
+            const randomIndex = Math.floor(Math.random() * slots.length);
+            if (randomExcludedTimes.indexOf(slots[randomIndex]) === -1) {
+              randomExcludedTimes.push(slots[randomIndex]);
+            }
+          }
+        }
+        
+        const finalSlots = slots.filter(time => !randomExcludedTimes.includes(time));
+        
+        console.log('🔄 Simulated available slots:', finalSlots);
+        console.log('🔄 Simulated excluded slots (already booked):', randomExcludedTimes);
+        
+        return finalSlots;
+      } else {
+        console.log('🔄 Date is not available (Sunday or Thursday)');
+        return [];
       }
-      
-      console.log('Generated simulated slots for', date.toDateString(), ':', slots);
-      return slots;
     }
 
     // Render calendar
@@ -1199,6 +1281,12 @@
     function updateTimeSlots(date) {
       const timeSlots = document.querySelectorAll('.time-slot');
       
+      console.log('🕐 Updating time slots for date:', date.toDateString());
+      console.log('🕐 Available slots from API:', availableSlots);
+      console.log('🕐 Total time slots found:', timeSlots.length);
+      
+      let visibleCount = 0;
+      
       timeSlots.forEach(slot => {
         const time = slot.textContent;
         slot.classList.remove('selected', 'unavailable');
@@ -1208,15 +1296,36 @@
           slot.style.display = 'block';
           slot.classList.remove('unavailable');
           slot.style.cursor = 'pointer';
+          visibleCount++;
+          console.log('✅ Time slot available:', time);
         } else {
           slot.style.display = 'none';
           slot.classList.add('unavailable');
           slot.style.cursor = 'not-allowed';
+          console.log('❌ Time slot unavailable:', time);
         }
       });
       
-      // デバッグ用：利用可能な時間をコンソールに出力
-      console.log('Available slots for', date.toDateString(), ':', availableSlots);
+      console.log('📊 Visible time slots:', visibleCount);
+      
+      // 利用可能な時間がない場合のメッセージ表示
+      if (visibleCount === 0) {
+        const timeSlotsContainer = document.getElementById('timeSlots');
+        const noSlotsMessage = document.createElement('div');
+        noSlotsMessage.className = 'no-slots-message';
+        noSlotsMessage.innerHTML = '<p>この日は利用可能な時間がありません。</p><p>別の日付をお選びください。</p>';
+        noSlotsMessage.style.textAlign = 'center';
+        noSlotsMessage.style.padding = '20px';
+        noSlotsMessage.style.color = 'var(--gray)';
+        
+        // 既存のメッセージを削除
+        const existingMessage = timeSlotsContainer.querySelector('.no-slots-message');
+        if (existingMessage) {
+          existingMessage.remove();
+        }
+        
+        timeSlotsContainer.appendChild(noSlotsMessage);
+      }
     }
 
     // Check if time is available
