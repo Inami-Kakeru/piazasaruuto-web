@@ -380,63 +380,78 @@
 
         // コンポーネントが読み込まれた後の処理
         document.addEventListener("DOMContentLoaded", function() {
-            console.log('DOM loaded, checking components...');
-            
-            // コンポーネントローダーの読み込み完了を待つ
-            function waitForComponentLoader() {
-                return new Promise((resolve) => {
-                    if (window.ComponentLoader) {
-                        resolve();
-                    } else {
-                        setTimeout(() => {
-                            if (window.ComponentLoader) {
-                                resolve();
-                            } else {
-                                console.warn('ComponentLoader still not available, continuing anyway...');
-                                resolve();
-                            }
-                        }, 500);
-                    }
-                });
-            }
-            
-            waitForComponentLoader().then(() => {
-                if (window.ComponentLoader) {
-                    console.log('ComponentLoader found, loading components...');
-                    // 手動でコンポーネントを読み込み
-                    ComponentLoader.loadAllComponents().then(() => {
-                        console.log('All components loaded, setting up event listeners...');
-                        setupEventListeners();
-                    }).catch(error => {
-                        console.error('Error loading components:', error);
-                        // エラーでも一度イベントリスナーを設定してみる
-                        setTimeout(setupEventListeners, 1000);
-                    });
-                } else {
-                    console.error('ComponentLoader not found after waiting');
-                    // フォールバック: 直接イベントリスナーを設定
-                    setTimeout(setupEventListeners, 1000);
-                }
-            });
+            console.log('DOM loaded, initializing components...');
+            initializeComponents();
         });
+
+        // コンポーネント初期化関数
+        function initializeComponents() {
+            // ComponentLoaderスクリプトが既に読み込まれているはず
+            if (window.ComponentLoader) {
+                console.log('ComponentLoader available, loading components...');
+                const componentLoader = new ComponentLoader();
+                componentLoader.loadAllComponents()
+                    .then(() => {
+                        console.log('✅ All components loaded successfully');
+                        // コンポーネント読み込み後に少し待ってからイベントリスナーを設定
+                        setTimeout(setupEventListeners, 200);
+                    })
+                    .catch(error => {
+                        console.error('❌ Error loading components:', error);
+                        // エラーでもイベントリスナーを設定
+                        setTimeout(setupEventListeners, 500);
+                    });
+            } else {
+                console.warn('⚠️ ComponentLoader not available, retrying...');
+                // 0.5秒後に再試行
+                setTimeout(initializeComponents, 500);
+            }
+        }
         
         function setupEventListeners() {
+            console.log('🔧 Setting up event listeners...');
+            
             // フッターの予約ボタン
-            var footerBtn = document.getElementById("footerReservationBtn");
+            const footerBtn = document.getElementById("footerReservationBtn");
             if (footerBtn) {
+                console.log('✅ Footer reservation button found');
                 footerBtn.addEventListener("click", function() {
+                    console.log('Footer button clicked - opening Cal.com');
                     Cal("open", { calLink: "稲見駆-7zb7cf/15min" });
                 });
+            } else {
+                console.warn('⚠️ Footer reservation button not found');
             }
             
             // ヘッダーの予約ボタン
-            var headerBtn = document.getElementById("headerReservationBtn");
+            const headerBtn = document.getElementById("headerReservationBtn");
             if (headerBtn) {
-                headerBtn.addEventListener("click", function() {
-                    // booking.htmlに移動
+                console.log('✅ Header reservation button found');
+                headerBtn.addEventListener("click", function(e) {
+                    e.preventDefault(); // デフォルトの動作を防止
+                    console.log('Header button clicked - navigating to booking.html');
                     window.location.href = "resavation/booking.html";
                 });
+            } else {
+                console.warn('⚠️ Header reservation button not found');
+                
+                // しばらく待ってから再試行
+                setTimeout(() => {
+                    const retryHeaderBtn = document.getElementById("headerReservationBtn");
+                    if (retryHeaderBtn) {
+                        console.log('✅ Header reservation button found on retry');
+                        retryHeaderBtn.addEventListener("click", function(e) {
+                            e.preventDefault();
+                            console.log('Header button clicked (retry) - navigating to booking.html');
+                            window.location.href = "resavation/booking.html";
+                        });
+                    } else {
+                        console.error('❌ Header reservation button still not found after retry');
+                    }
+                }, 1000);
             }
+            
+            console.log('🔧 Event listeners setup completed');
         }
     </script>
 </body>

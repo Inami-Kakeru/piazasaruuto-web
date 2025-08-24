@@ -1,6 +1,6 @@
 <!-- Header Component -->
 <header class="header">
-    <div class="container">
+    <div class="header-container">
         <a href="#home" class="logo">ぴあざさるうと</a>
         <nav class="nav" role="navigation" aria-label="メインナビゲーション">
             <ul class="nav-list">
@@ -36,7 +36,7 @@
     transition: all 0.3s ease;
 }
 
-.container {
+.header-container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
@@ -164,7 +164,7 @@
         display: flex;
     }
     
-    .container {
+    .header-container {
         padding: 10px 15px;
         height: 50px;
     }
@@ -179,14 +179,6 @@
 <!-- Header Scripts -->
 <script>
 // Header reservation button functionality
-document.addEventListener("DOMContentLoaded", function() {
-    const headerBtn = document.getElementById("headerReservationBtn");
-    if (headerBtn) {
-        headerBtn.addEventListener("click", function() {
-            // 直接booking.htmlに移動
-            console.log('Navigating to: resavation/booking.html');
-            window.location.href = 'resavation/booking.html';
-        });
-    }
-});
+// Note: イベントリスナーはindex.htmlの方で設定されるため、ここでは設定しない
+console.log('Header component loaded');
 </script>
