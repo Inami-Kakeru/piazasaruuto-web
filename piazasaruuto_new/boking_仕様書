@@ -1,0 +1,438 @@
+# 予約システム仕様書
+
+## システム概要
+
+ぴあざさるうと予約システムは、Cal.com API v2を利用した美容院予約システムです。
+5ステップの予約フローで、メニュー選択から予約完了までを管理します。
+
+## 予約フロー
+
+### 1. メニュー選択 (`/booking/menu`)
+**入力**: なし  
+**出力**: メニュー選択画面  
+**遷移**: `/booking/date?menu=<key>&menuName=<name>`
+
+**メニュー定義**:
+```typescript
+const MENUS = [
+  { key: 'cut', name: 'カット', price: '¥3,500', duration: '約60分' },
+  { key: 'cut-color', name: 'カット + カラー', price: '¥8,500', duration: '約90分' },
+  { key: 'cut-perm', name: 'カット + パーマ', price: '¥10,500', duration: '約150分' },
+  { key: 'treatment', name: 'トリートメント', price: '¥3,500', duration: '約45分' },
+];
+```
+
+### 2. 日時選択 (`/booking/date`)
+**入力**: 
+- `menu`: メニューキー
+- `menuName`: メニュー名
+
+**API呼び出し**:
+```
+GET /api/cal/slots?menu=<key>&date=YYYY-MM-DD&timeZone=Asia/Tokyo
+```
+
+**出力**: カレンダー表示 + 空き時間選択  
+**遷移**: `/booking/info?menu=<key>&menuName=<name>&date=YYYY-MM-DD&start=<ISO>&end=<ISO>`
+
+**ビジネスルール**:
+- 日曜・木曜は休業日
+- 過去の日付は選択不可
+- 選択した日付の空き時間をAPIで取得
+
+### 3. お客様情報入力 (`/booking/info`)
+**入力**:
+- `menu`: メニューキー
+- `menuName`: メニュー名
+- `date`: 日付 (YYYY-MM-DD)
+- `start`: 開始時間 (ISO)
+- `end`: 終了時間 (ISO)
+
+**出力**: お客様情報入力フォーム  
+**遷移**: `/booking/confirm?menu=<key>&menuName=<name>&date=...&start=...&end=...&name=...&email=...&phone=...`
+
+**入力項目**:
+- お名前 (必須)
+- メールアドレス (必須)
+- 電話番号 (任意)
+
+### 4. 確認 (`/booking/confirm`)
+**入力**:
+- `menu`: メニューキー
+- `menuName`: メニュー名
+- `date`: 日付
+- `start`: 開始時間
+- `end`: 終了時間
+- `name`: お名前
+- `email`: メールアドレス
+- `phone`: 電話番号
+
+**API呼び出し**:
+```
+POST /api/cal/bookings
+{
+  menu: string,
+  start: string (ISO),
+  end?: string (ISO),
+  timeZone: "Asia/Tokyo",
+  name: string,
+  email: string,
+  phone?: string
+}
+```
+
+**出力**: 予約内容確認画面  
+**遷移**: `/booking/complete?uid=<bookingId>&menu=<key>&menuName=<name>&start=...&end=...&name=...&phone=...&email=...`
+
+### 5. 完了 (`/booking/complete`)
+**入力**:
+- `uid`: 予約ID
+- `menu`: メニューキー
+- `menuName`: メニュー名
+- `start`: 開始時間
+- `name`: お名前
+- `email`: メールアドレス
+- `phone`: 電話番号
+
+**出力**: 予約完了画面
+
+## API仕様書（実装準拠版）
+
+### スロット関連 API
+
+#### GET /api/cal/slots
+
+📤 **リクエスト**
+- クエリパラメータ:
+  - `menu` (推奨): メニューキー
+  - `date` (推奨): YYYY-MM-DD形式の日付
+  - `start` (任意): ISO形式の開始時間
+  - `end` (任意): ISO形式の終了時間
+  - `timeZone` (任意): タイムゾーン（デフォルト: Asia/Tokyo）
+
+📥 **レスポンス**
+```json
+{
+  "status": "success",
+  "eventTypeId": number,
+  "timeZone": string,
+  "range": {
+    "start": string,
+    "end": string
+  },
+  "slots": [
+    {
+      "start": string,
+      "end": string
+    }
+  ],
+  "data": {
+    "YYYY-MM-DD": [
+      {
+        "start": string,
+        "end": string
+      }
+    ]
+  },
+  "raw": object
+}
+```
+
+**エラーレスポンス**:
+```json
+{
+  "routeId": "slots/list",
+  "error": string,
+  "details": {
+    "eventTypeId": number,
+    "sent": {
+      "start": string,
+      "end": string,
+      "timeZone": string
+    },
+    "triedEndpoints": [
+      {
+        "url": string,
+        "status": number
+      }
+    ]
+  }
+}
+```
+
+**実装詳細**:
+- Cal.com API v2/v1のフォールバック機能付き
+- 3つのエンドポイントを順次試行:
+  1. `/v2/slots?eventTypeId=&start=&end=&timeZone=`
+  2. `/v2/event-types/:id/slots?start=&end=&timeZone=&format=range`
+  3. `/v1/slots?eventTypeId=&startTime=&endTime=&timeZone=`
+- サービス時間の自動計算（`start`のみの場合、`end`を自動生成）
+
+#### POST /api/cal/slots/reserve
+
+📤 **リクエスト**
+```json
+{
+  "menu": string,
+  "start": string (ISO),
+  "end": string (ISO),
+  "timeZone": string
+}
+```
+
+📥 **レスポンス**
+```json
+{
+  "status": "success",
+  "data": {
+    "reservationUid": string,
+    "eventTypeId": number,
+    "timeZone": string,
+    "start": string,
+    "end": string
+  }
+}
+```
+
+**実装詳細**:
+- ソフト仮押さえ（クライアント用nonce発行）
+- Cal.com APIへの実際の呼び出しは行わない
+- 予約時（`/api/cal/bookings`）で競合検知
+
+### 予約関連 API
+
+#### GET /api/cal/bookings
+
+📤 **リクエスト**: なし
+
+📥 **レスポンス**
+```json
+{
+  "ok": true,
+  "where": "/api/cal/bookings"
+}
+```
+
+#### POST /api/cal/bookings
+
+📤 **リクエスト**
+```json
+{
+  "menu": string,
+  "start": string (ISO),
+  "end": string (ISO),
+  "timeZone": string,
+  "name": string,
+  "email": string,
+  "phone": string,
+  "reservationUid": string
+}
+```
+
+📥 **レスポンス**
+```json
+{
+  "uid": string,
+  "start": string,
+  "end": string,
+  "attendee": {
+    "name": string,
+    "email": string,
+    "timeZone": string,
+    "language": string,
+    "phoneNumber": string
+  },
+  "metadata": {
+    "menu": string,
+    "phone": string
+  }
+}
+```
+
+**エラーレスポンス**:
+```json
+{
+  "routeId": "bookings/create",
+  "error": string,
+  "details": {
+    "url": string,
+    "sent": {
+      "eventTypeId": number,
+      "start": string,
+      "timeZone": string,
+      "hasReservationUid": boolean
+    },
+    "status": number
+  }
+}
+```
+
+**実装詳細**:
+- Cal.com API v2 `/bookings` エンドポイントを使用
+- タイムゾーン変換（+09:00 → UTC）
+- メタデータにメニュー情報を保存
+
+#### GET /api/cal/bookings/[uid]
+
+📤 **リクエスト**
+- パラメータ: `uid` (予約のUID)
+
+📥 **レスポンス**
+```json
+{
+  // Cal.com APIからの予約詳細データ（そのまま返却）
+}
+```
+
+**エラーレスポンス**:
+```json
+{
+  "error": "uid missing"
+}
+```
+
+**実装詳細**:
+- Cal.com API v2 `/bookings/:uid` エンドポイントを使用
+- レスポンスはCal.com APIの形式をそのまま返却
+
+#### POST /api/cal/bookings/cancel
+
+📤 **リクエスト**
+```json
+{
+  "uid": string,
+  "reason": string,
+  "cancelSubsequent": boolean,
+  "seatUid": string
+}
+```
+
+📥 **レスポンス**
+```json
+{
+  // Cal.com APIからのキャンセル結果（そのまま返却）
+}
+```
+
+**エラーレスポンス**:
+```json
+{
+  "error": "uid is required (booking uid)"
+}
+```
+
+**実装詳細**:
+- Cal.com API v2 `/bookings/:uid/cancel` エンドポイントを使用
+- オプションパラメータの適切な処理
+
+### Webhook API
+
+#### POST /api/cal/webhook
+
+📤 **リクエスト**
+```json
+{
+  "event": string,
+  "data": object
+}
+```
+
+📥 **レスポンス**
+```json
+{
+  "ok": true
+}
+```
+
+**エラーレスポンス**:
+```json
+{
+  "error": "invalid json"
+}
+```
+
+**実装詳細**:
+- 署名検証機能はコメントアウト（実装可能）
+- 開発用ログ出力
+- 将来的なDB更新・通知処理の準備
+
+### ヘルスチェック API
+
+#### GET /api/health
+
+📤 **リクエスト**: なし
+
+📥 **レスポンス**
+```json
+{
+  "ok": boolean,
+  "where": "/api/health"
+}
+```
+
+**実装詳細**:
+- 必須環境変数の存在チェック
+- `CAL_BASE_URL`, `CAL_API_KEY`, `CAL_EVENT_TYPE_ID` の確認
+- ステータスコード: 200（正常）または 500（異常）
+
+## 環境変数
+
+### 必須
+- `CAL_API_KEY`: Cal.com APIキー
+- `CAL_BASE_URL`: Cal.com APIのベースURL（デフォルト: https://api.cal.com）
+
+### 推奨
+- `CAL_DEFAULT_TZ`: デフォルトタイムゾーン（デフォルト: Asia/Tokyo）
+- `CAL_API_VERSION`: Cal.com APIバージョン（デフォルト: 2024-09-04）
+
+### メニュー設定（いずれか）
+- `CAL_MENU_MAP`: JSON形式のメニュー→イベントタイプIDマップ
+  ```
+  {"cut":3120867,"cut-color":3120869,"cut-perm":3120870,"treatment":3120871}
+  ```
+- `CAL_EVENT_TYPE_ID`: デフォルトのイベントタイプID
+- 個別環境変数:
+  - `CAL_EVT_CUT`
+  - `CAL_EVT_CUT_COLOR`
+  - `CAL_EVT_CUT_PERM`
+  - `CAL_EVT_TREATMENT`
+
+### サービス時間設定（いずれか）
+- `CAL_LENGTH_MAP`: JSON形式のメニュー→時間（分）マップ
+  ```
+  {"cut":60,"cut-color":90,"cut-perm":150,"treatment":45}
+  ```
+- `CAL_LENGTH_DEFAULT_MIN`: デフォルトのサービス時間（分、デフォルト: 20）
+
+### オプション
+- `CAL_WEBHOOK_SECRET`: Webhook署名検証用のシークレット
+
+## 今後のステップ
+
+### 1. 実装完了項目
+- ✅ 予約フロー全体の実装
+- ✅ Cal.com API v2連携
+- ✅ エラーハンドリング
+- ✅ レスポンシブデザイン
+
+### 2. 改善項目
+- 🔄 API仕様書の更新（実際の実装に合わせる）
+- 🔄 環境変数の整理とドキュメント化
+- 🔄 エラーメッセージの統一
+
+### 3. 追加機能検討
+- 📋 予約変更機能
+- 📋 予約キャンセル機能（フロントエンド）
+- 📋 予約履歴表示
+- 📋 メール通知機能
+- 📋 管理者ダッシュボード
+
+### 4. セキュリティ強化
+- 🔒 URLパラメータでの機密情報送信の見直し
+- 🔒 セッション管理の改善
+- 🔒 CSRF対策の実装
+
+### 5. パフォーマンス最適化
+- ⚡ キャッシュ戦略の検討
+- ⚡ 画像最適化
+- ⚡ バンドルサイズの最適化
