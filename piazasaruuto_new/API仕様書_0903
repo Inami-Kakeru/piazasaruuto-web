@@ -1,0 +1,182 @@
+# API仕様書
+
+## 予約関連 API
+
+### GET /api/cal/bookings
+
+📤 リクエスト
+なし
+
+📥 レスポンス
+```json
+{
+  "ok": true,
+  "where": "/api/cal/bookings"
+}
+```
+
+### POST /api/cal/bookings
+
+📤 リクエスト
+```json
+{
+  // 任意のJSONデータ
+}
+```
+
+📥 レスポンス
+```json
+{
+  "ok": true,
+  "where": "/api/cal/bookings",
+  "received": {}
+}
+```
+
+### GET /api/cal/bookings/[uid]
+
+📤 リクエスト
+- パラメータ: `uid` (予約のUID)
+
+📥 レスポンス
+```json
+{
+  // Cal.com APIからの予約詳細データ
+}
+```
+or
+```json
+{
+  "error": "uid missing"
+}
+```
+
+### POST /api/cal/bookings/cancel
+
+📤 リクエスト
+```json
+{
+  "uid": string,
+  "reason": string,
+  "cancelSubsequent": boolean,
+  "seatUid": string
+}
+```
+
+📥 レスポンス
+```json
+{
+  // Cal.com APIからのキャンセル結果
+}
+```
+or
+```json
+{
+  "error": "uid is required (booking uid)"
+}
+```
+or
+```json
+{
+  "error": "env missing"
+}
+```
+
+## スロット関連 API
+
+### GET /api/cal/slots
+
+📤 リクエスト
+- クエリパラメータ: 任意
+
+📥 レスポンス
+```json
+{
+  "ok": true,
+  "where": "/api/cal/slots",
+  "query": {}
+}
+```
+
+### POST /api/cal/slots/reserve
+
+📤 リクエスト
+```json
+{
+  // 任意のJSONデータ
+}
+```
+
+📥 レスポンス
+```json
+{
+  "ok": true,
+  "where": "/api/cal/slots/reserve",
+  "received": {}
+}
+```
+
+## Webhook API
+
+### POST /api/cal/webhook
+
+📤 リクエスト
+```json
+{
+  "event": string,
+  "data": object
+}
+```
+
+📥 レスポンス
+```json
+{
+  "ok": true
+}
+```
+or
+```json
+{
+  "error": "invalid json"
+}
+```
+
+## ヘルスチェック API
+
+### GET /api/health
+
+📤 リクエスト
+なし
+
+📥 レスポンス
+```json
+{
+  "ok": true,
+  "where": "/api/health"
+}
+```
+or
+```json
+{
+  "ok": false,
+  "where": "/api/health"
+}
+```
+
+## エラーレスポンス共通形式
+
+すべてのAPIエンドポイントでエラーが発生した場合、以下の形式でレスポンスが返されます：
+
+```json
+{
+  "error": "エラーメッセージ"
+}
+```
+
+## 環境変数
+
+以下の環境変数が必要です：
+- `CAL_BASE_URL`: Cal.com APIのベースURL
+- `CAL_API_KEY`: Cal.com APIキー
+- `CAL_EVENT_TYPE_ID`: イベントタイプID
+- `CAL_WEBHOOK_SECRET`: Webhook署名検証用のシークレット（任意）

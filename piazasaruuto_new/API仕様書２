@@ -1,0 +1,286 @@
+了解です。これまでの変更点をすべて反映した**最新版 API 仕様書**を用意しました。コピペで使える形にまとめています。
+
+# API仕様書 v2（2025-09 更新）
+
+## 共通事項
+
+* すべてのレスポンスは `application/json; charset=utf-8`
+* 時刻は **ISO 8601**（例: `2025-09-02T10:00:00.000+09:00`）。`GET /api/cal/slots` は `date`（JST日付）か `start/end` を指定
+* メニューは `menu`（例: `cut` / `cut-color`）で指定。**eventTypeId はサーバ側で解決**
+
+  * 優先: `CAL_MENU_MAP`（JSON文字列）
+  * 次点: `CAL_EVT_*`（レガシー）
+  * 最後: `CAL_EVENT_TYPE_ID`（単一メニュー）
+* 共通エラー形式：
+
+```json
+{ "routeId": "endpoint/name", "error": "メッセージ", "details": { /* 追加情報 */ } }
+```
+
+---
+
+## 環境変数
+
+| 変数                   | 必須  | 説明                                                    |
+| -------------------- | --- | ----------------------------------------------------- |
+| `CAL_BASE_URL`       | 任意  | 既定 `https://api.cal.com/v2`                           |
+| `CAL_API_KEY`        | 必須  | Cal.com API キー                                        |
+| `CAL_DEFAULT_TZ`     | 任意  | 既定 `Asia/Tokyo`                                       |
+| `CAL_EVENT_TYPE_ID`  | 条件付 | 単一メニュー運用時の既定 eventTypeId                              |
+| `CAL_MENU_MAP`       | 条件付 | 例 `{"cut":3120867,"cut-color":3120869}`（複数メニュー運用時に推奨） |
+| `CAL_EVT_CUT` 等      | 任意  | レガシー（`cut`/`cut-color`/`cut-perm`/`treatment`）        |
+| `CAL_WEBHOOK_SECRET` | 任意  | Webhook 署名検証用                                         |
+
+---
+
+## スロット関連
+
+### GET `/api/cal/slots`
+
+**用途**: 指定日の空き枠取得（Cal v2の `/event-types/:id/slots` を代理）
+
+#### クエリ
+
+* `menu` *(任意)*: メニューキー（例: `cut-color`）
+* `date` *(推奨)*: `YYYY-MM-DD`（指定日 00:00–23:59:59.999 の範囲を自動生成）
+* `timeZone` *(任意)*: 既定 `Asia/Tokyo`
+* もしくは `start` & `end`（ISO 8601 / `format=range` でCalへ中継）
+
+#### 成功 (200)
+
+```json
+{
+  "status": "success",
+  "eventTypeId": 3120869,
+  "timeZone": "Asia/Tokyo",
+  "range": { "start": "2025-09-02T00:00:00.000+09:00", "end": "2025-09-02T23:59:59.999+09:00" },
+  "slots": [
+    { "start": "2025-09-02T10:00:00.000+09:00", "end": "2025-09-02T10:20:00.000+09:00" }
+  ],
+  "data": { "2025-09-02": [ { "start": "...", "end": "..." } ] },
+  "raw": { /* Calの生レスポンス（非依存推奨） */ }
+}
+```
+
+#### 代表エラー
+
+* 400: `start and end are required (or provide date)`
+* 400: `eventTypeId is not configured for this menu`
+* 5xx: Cal 側/環境変数不備 など
+
+---
+
+### POST `/api/cal/slots/reserve`
+
+**用途**: **ソフト仮押さえ**。Cal.com への強制ホールドは行わず、**本予約時の競合を409で検知**する設計。
+
+#### リクエスト Body
+
+```json
+{ "start": "ISO8601", "end": "ISO8601", "menu": "cut-color", "timeZone": "Asia/Tokyo" }
+```
+
+#### 成功 (200)
+
+```json
+{
+  "status": "success",
+  "data": {
+    "reservationUid": "910ded3f-2f6b-42e9-890b-c6eddbde7f1c",
+    "eventTypeId": 3120869,
+    "timeZone": "Asia/Tokyo",
+    "start": "ISO8601",
+    "end": "ISO8601"
+  }
+}
+```
+
+#### 代表エラー
+
+* 400: `start,end are required`
+* 400: `eventTypeId が解決できません...`
+
+> **備考**: 必要なら `reservationUid` と枠情報を KV/DB に TTL で保存してもOK（現行は stateless）。
+
+---
+
+## 予約関連
+
+### GET `/api/cal/bookings`
+
+**用途**: 簡易ヘルス（一覧は返さない）
+
+#### 成功 (200)
+
+```json
+{ "ok": true, "where": "/api/cal/bookings" }
+```
+
+---
+
+### POST `/api/cal/bookings`
+
+**用途**: **本予約作成**（Cal v2 `/bookings` を代理）
+
+#### リクエスト Body
+
+```json
+{
+  "menu": "cut-color",              // 任意（eventTypeId 解決に使用）
+  "start": "ISO8601",               // 必須
+  "end": "ISO8601",                 // 必須
+  "name": "テスト太郎",              // 必須
+  "email": "you@example.com",       // 必須
+  "phone": "090-0000-0000",         // 任意
+  "reservationUid": "任意のUID",     // 任意（/slots/reserve の戻り値）
+  "timeZone": "Asia/Tokyo"          // 任意（既定）
+}
+```
+
+> サーバが Cal 用に変換して送信：
+>
+> ```jsonc
+> {
+>   "eventTypeId": 3120869,
+>   "start": "UTCまたはISO8601",
+>   "end": "UTCまたはISO8601",
+>   "timeZone": "Asia/Tokyo",
+>   "attendees": [{
+>     "name": "テスト太郎",
+>     "email": "you@example.com",
+>     "timeZone": "Asia/Tokyo",
+>     "language": "ja",
+>     "phoneNumber": "090-0000-0000"
+>   }],
+>   "metadata": { "attendeeNameJP": "テスト太郎", "attendeePhone": "090-0000-0000" },
+>   "reservationUid": "…"(任意)
+> }
+> ```
+>
+> ※ **`language` は top-level では送らず、attendee 内のみに設定**
+
+#### 成功 (201)
+
+```json
+{ "status": "success", "bookingId": "quQwcrhsnz6E7tzrqriA6n", "data": { /* Cal応答全文 */ } }
+```
+
+#### 代表エラー
+
+* 400: `start,end,name,email are required` / `invalid datetime format` など
+* 409: 競合（枠が先に埋まった）
+* 422: Cal バリデーションエラー
+* 5xx: Cal 側/環境不備（`details.cal` に転送）
+
+---
+
+### GET `/api/cal/bookings/[uid]`
+
+**用途**: 予約詳細（Cal `/bookings/:uid` 代理）
+
+#### 成功 (200)
+
+```json
+{ /* Cal の booking 詳細そのまま */ }
+```
+
+#### 代表エラー
+
+* 400: `uid missing`
+* 404: Not Found（Cal 透過）
+* 5xx: 透過
+
+---
+
+### POST `/api/cal/bookings/cancel`
+
+**用途**: 予約キャンセル（Cal `/bookings/cancel` 代理）
+
+#### リクエスト Body
+
+```json
+{
+  "uid": "予約UID",              // 必須
+  "reason": "任意の理由",        // 任意（推奨）
+  "cancelSubsequent": false,     // 任意（デフォルト false）
+  "seatUid": "マルチシート用"     // 任意
+}
+```
+
+#### 成功 (200/204)
+
+* Cal 応答を透過（成功時は 200 or 204）
+
+#### 代表エラー
+
+* 400: `uid is required (booking uid)`
+* 5xx: 透過
+
+---
+
+## Webhook
+
+### POST `/api/cal/webhook`
+
+**用途**: Cal からのイベント通知受信
+**署名**: `x-cal-signature-256`（`CAL_WEBHOOK_SECRET` がある場合のみ検証）
+
+#### リクエスト Body
+
+```json
+{ "event": "booking_created", "data": { /* payload */ } }
+```
+
+#### 成功 (200)
+
+```json
+{ "ok": true }
+```
+
+#### 代表エラー
+
+* 400: `invalid json` / `invalid signature`
+
+---
+
+## ヘルスチェック
+
+### GET `/api/health`
+
+```json
+{ "ok": true, "where": "/api/health" }
+```
+
+---
+
+## ステータスコード早見表
+
+* 200: OK / 204: No Content
+* 201: Created（予約作成成功）
+* 400: リクエスト不備
+* 401/403: 認証・権限（内部で発生時は適切に透過）
+* 404: 存在しない
+* 409: 予約競合
+* 422: 検証エラー（Cal）
+* 5xx: サーバ/外部依存エラー
+
+---
+
+## フロント連携要点
+
+* `/booking/date` → `GET /api/cal/slots?menu=xxx&date=YYYY-MM-DD&timeZone=Asia/Tokyo`
+* `/booking/confirm` → `POST /api/cal/slots/reserve`（任意）→ `POST /api/cal/bookings`
+* URLクエリは `start` / `end` も含めて `info` → `confirm` → `complete` に受け渡し
+
+---
+
+## 変更履歴（前版との差分）
+
+* `GET /api/cal/slots`：**Cal v2準拠**に更新し、`{status, eventTypeId, range, slots, data, raw}` を返す
+* `POST /api/cal/slots/reserve`：**ソフト仮押さえ方式**に変更（UID発行、Calへは投げない）
+* `POST /api/cal/bookings`：**top-level `language` を排除**、`attendees[].language` のみに統一／`end` を必須
+* 予約系のエラーは **409/422 を透過**、`details` に送信内容/Cal応答を格納
+
+---
+
+必要なら、この仕様に沿って **型定義（TSの`@types/api`）** もすぐ用意します。

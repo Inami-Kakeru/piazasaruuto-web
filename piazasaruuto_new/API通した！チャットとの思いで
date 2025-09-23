@@ -1,0 +1,145 @@
+やったー！一気に前進できて最高です 🙌
+次のチャットに引き継ぐための「必要情報まとめ」を置いていきます。これだけ渡せばサイト側の構築にスムーズに入れます。
+
+# ハンドオフメモ（要点まとめ）
+
+## 環境変数（.env.local）
+
+```env
+# Cal.com
+CAL_BASE_URL=https://api.cal.com/v2
+CAL_API_KEY=<<CalのAPIキー>>
+CAL_DEFAULT_TZ=Asia/Tokyo
+
+# メニュー → EventTypeId
+# どちらか1つでOK。CAL_MENU_MAPが優先
+CAL_MENU_MAP={"cut":3120869,"cut-color":3120868,"cut-perm":3120867,"treatment":3120866}
+# 既定値（単一メニュー運用用）
+CAL_EVENT_TYPE_ID=3120869
+```
+
+## 実装済みAPI（Next.js /app/api）
+
+* `GET /api/cal/slots`
+
+  * Cal v2 **/v2/slots** を使用
+  * 受取: `menu`（任意だが推奨）, `date=YYYY-MM-DD` または `start&end`, `timeZone`
+  * 返却:
+
+    ```json
+    {
+      "status":"success",
+      "eventTypeId":3120869,
+      "timeZone":"Asia/Tokyo",
+      "range":{"start":"...+09:00","end":"...+09:00"},
+      "slots":[{"start":"...","end":"..."}],
+      "data":{"YYYY-MM-DD":[...]},
+      "raw":{...}
+    }
+    ```
+
+* `POST /api/cal/bookings`
+
+  * **フロントからは reservationUid を送らない**（サーバ側で「仮押さえ→本予約」を内製）
+  * 受取: `{ menu, start, end?, name, email, phone? }`
+  * Cal v2 予約作成を実行（内部で `timeZone=Asia/Tokyo`）
+  * 返却: `{ status:"success", data:{ uid, meetingUrl?, ... } }`（または `bookingId` を包含）
+
+* `POST /api/cal/slots/reserve`
+
+  * 内部利用（`/api/cal/bookings` が呼ぶ）。クライアントからは基本不要。
+
+* `GET /api/cal/bookings/[uid]` / `POST /api/cal/bookings/cancel`
+
+  * 予約参照・キャンセル用（将来のマイページ/管理向け）。
+
+## フロント（重要ポイント）
+
+* `/booking/date`
+
+  * `GET /api/cal/slots?menu=...&date=...&timeZone=Asia/Tokyo` を叩いて表示。
+  * `URLSearchParams` が自動エンコード → **二重エンコード禁止**。
+* `/booking/info`
+
+  * 名前・メール（必須）＋電話（任意）を入力。
+* `/booking/confirm` ✅（最新版）
+
+  * **1回だけ** `POST /api/cal/bookings`（`reservationUid` は送らない）。
+  * 成功時、`/booking/complete?uid=...&start=...&...` に `replace` 遷移。
+* `/booking/complete` ✅
+
+  * 表示専用。APIは叩かない。
+
+## 動作確認コマンド（PowerShell）
+
+```powershell
+# スロット取得（例）
+$day="2025-09-05"
+Invoke-RestMethod "http://localhost:3000/api/cal/slots?menu=cut&date=$day&timeZone=Asia/Tokyo" -Method GET | ConvertTo-Json -Depth 6
+
+# 先頭スロットで予約作成（最小経路）
+$slots = Invoke-RestMethod "http://localhost:3000/api/cal/slots?menu=cut&date=$day&timeZone=Asia/Tokyo" -Method GET
+$first = $slots.data.$day[0]
+$bp = @{ menu="cut"; start=$first.start; end=$first.end; name="テスト太郎"; email="you@example.com"; phone="090-0000-0000" } | ConvertTo-Json -Compress
+Invoke-RestMethod "http://localhost:3000/api/cal/bookings" -Method POST -ContentType "application/json" -Body ([Text.Encoding]::UTF8.GetBytes($bp)) | ConvertTo-Json -Depth 6
+```
+
+## よくある落とし穴（今回ハマった点）
+
+* **予約POSTに `reservationUid` を送ると 400（should not exist）**
+  → サーバ側で仮押さえ実施する設計に統一。
+* **Edge ランタイムで env が読めない/ホットリロード不安定**
+  → API ルートは `runtime = "nodejs"` 固定。
+* **Cal v2のスロットは `/v2/slots` が正解**（`/event-types/:id/slots` は v1系互換、404 になり得る）。
+* **TZの扱い**
+
+  * UIは `+09:00` 付きISOで渡す。サーバがUTCに揃えてCalへ送る。
+* **menu → eventTypeId**
+
+  * `.env` の `CAL_MENU_MAP`（JSON）優先。なければ `CAL_EVENT_TYPE_ID`。
+
+## サイト構築の次ステップ（提案）
+
+1. **スタイル/レイアウト**
+
+   * 予約ステップのUI最終仕上げ（選択状態・無効時のアクセシビリティ）。
+2. **バリデーション**
+
+   * infoページでの入力チェック・エラーメッセージのi18n。
+3. **キャンセル導線**
+
+   * 完了画面に「予約をキャンセルする」リンク（`/api/cal/bookings/cancel` 呼び）。
+4. **在庫レース対策**
+
+   * confirmで 409/422（枠が埋まった）をハンドリング → date に戻して再選択。
+5. **監視/ログ**
+
+   * x-request-id の表示、重要イベントのコンソール/サーバログ（薄く実装済。展開先に合わせて整備）。
+6. **E2E テスト**
+
+   * Playwright で `menu→date→info→confirm→complete` の正常系＆エラー系を1本ずつ。
+
+## 参考：フォルダ（要点）
+
+```
+app/
+  api/
+    cal/
+      slots/route.ts            # v2/slots 呼び出し
+      bookings/route.ts         # 仮押さえ→本予約（reservationUidは外部非公開）
+      bookings/[uid]/route.ts   # 予約参照
+      bookings/cancel/route.ts  # 予約キャンセル
+      webhook/route.ts          # 必要なら
+  (booking)/
+    booking/
+      menu/page.tsx
+      date/page.tsx
+      info/page.tsx
+      confirm/page.tsx          # ← 今回修正
+      complete/page.tsx         # ← 表示専用
+```
+
+---
+
+ここまで本当にお疲れさまでした！
+次のチャットでは「サイトの見た目仕上げ・キャンセル導線・E2Eテスト」から入るのがオススメです。必要ならこのハンドオフをそのまま貼ってスタートしてください。こちらこそ、最後まで一緒にやれて楽しかったです。ありがとう！🍵✨

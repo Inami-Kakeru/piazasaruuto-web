@@ -1,0 +1,119 @@
+アーキテクチャのマッピング（処理の順番つき）
+
+/booking/menu（UI）
+
+ファイル：app/(booking)/booking/menu/page.tsx
+
+役割：メニューをローカル定義から表示 → クリックで /booking/date?menu=<key>&menuName=<name> に遷移。
+
+API呼び出し：不要（静的画面・選択のみ）
+
+/booking/date（UI）
+
+ファイル：app/(booking)/booking/date/page.tsx
+
+役割：カレンダー表示・日付クリックで空き枠を取得し、時間ボタンを出す。
+
+内部API呼び出し：
+GET /api/cal/slots?menu=<key>&date=YYYY-MM-DD&timeZone=Asia/Tokyo
+（※ menu を必ず渡す。これで eventTypeId を決定）
+
+次画面への遷移：時間クリック →
+/booking/info?menu=<key>&menuName=<name>&date=YYYY-MM-DD&start=<ISO>&end=<ISO>
+
+/booking/info（UI）
+
+ファイル：app/(booking)/booking/info/page.tsx
+
+役割：氏名（必須）・メール（必須）・電話（任意）入力。
+
+次画面：
+/booking/confirm?menu=<key>&menuName=<name>&date=...&start=...&end=...&name=...&email=...&phone=...
+
+/booking/confirm（UI）
+
+ファイル：app/(booking)/booking/confirm/page.tsx
+
+役割：確認→予約実行。
+
+内部API呼び出し（順番が重要）：
+① POST /api/cal/slots/reserve（{ menu,start,end } → reservationUid 取得）
+② POST /api/cal/bookings（{ menu,start,end,name,email,phone?,reservationUid } → bookingId）
+
+成功時遷移：/booking/complete?bookingId=<uid>&...
+
+/booking/complete（UI）
+
+ファイル：app/(booking)/booking/complete/page.tsx
+
+役割：完了表示（bookingId を使って軽い表示）
+
+内部API：空き枠
+
+ファイル：app/api/cal/slots/route.ts
+
+役割：Cal v2 の slots をプロキシ（スタブではない）
+
+受け取るクエリ：menu（任意/推奨）、date（推奨）、timeZone
+
+実コール：GET /v2/event-types/:eventTypeId/slots?start=<UTC>&end=<UTC>&timeZone=<IANA>&format=range
+
+start,end は date から 1日分の UTC 範囲を作る
+
+eventTypeId は menu → マッピング or 既定 CAL_EVENT_TYPE_ID
+
+返却：{ status:"success", eventTypeId, timeZone, range:{start,end}, slots:[...], data:{ [YYYY-MM-DD]: Slot[] } }
+
+内部API：仮押さえ
+
+ファイル：app/api/cal/slots/reserve/route.ts
+
+受信：{ menu?, start, end }
+
+実コール：Cal の reserve 相当（あなたの環境では、end 必須・eventTypeId 必須）
+
+返却：{ status:"success", data:{ reservationUid } }
+
+内部API：予約作成
+
+ファイル：app/api/cal/bookings/route.ts
+
+受信：{ menu?, start, end, name, email, phone?, reservationUid? }
+
+実コール：POST https://api.cal.com/v2/bookings にそのままの JSONを送る
+
+NG：{ data: {...} } で包む
+
+NG：top-level の language
+
+OK：{ eventTypeId, start, end, timeZone, attendees:[{ name,email,timeZone,language? }], metadata?, reservationUid? }
+
+返却：201 + { status:"success", bookingId, data }
+
+内部API：予約詳細
+
+ファイル：app/api/cal/bookings/[uid]/route.ts
+
+注意：params が Promise なので await ctx.params が必要（あなたの修正はOK）
+
+実コール：GET /v2/bookings/:uid
+
+（任意）内部API：キャンセル
+
+ファイル：app/api/cal/bookings/cancel/route.ts
+
+受信：{ uid, reason, cancelSubsequent? }
+
+実コール：対応する v2 エンドポイント
+
+返却：{ status:"success" }
+
+共通ライブラリ
+
+lib/eventTypeMap.ts：menu → eventTypeId マップ
+
+lib/calClient.ts：UI から内部APIを呼ぶ薄いクライアント
+
+lib/env.mjs：環境変数バリデーション（CAL_API_KEY, CAL_BASE_URL, CAL_DEFAULT_TZ, CAL_EVENT_TYPE_ID など）
+
+lib/logger.ts：構造化ログ・x-request-id・エラー整形
