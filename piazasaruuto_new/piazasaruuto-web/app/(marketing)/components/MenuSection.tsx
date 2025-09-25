@@ -1,9 +1,10 @@
 "use client";
+import React from "react";
 import { BadgePercent, Scissors, Palette, Waves, Sparkles, Package, Tag, Phone } from "lucide-react";
 import { SITE } from "../../../lib/marketing/constants";
 
 type PriceItem = { label: string; price?: string; badge?: "range" | "ask" | "contact" };
-type Category = { key: string; title: string; note?: string; icon: JSX.Element; items: PriceItem[]; footerNote?: string };
+type Category = { key: string; title: string; note?: string; icon: React.ReactElement; items: PriceItem[]; footerNote?: string };
 
 const yen = (v: number) => `￥${v.toLocaleString()}`;
 
@@ -170,13 +171,12 @@ export default function MenuSection() {
                 <li key={c.label} className="py-4 flex items-start justify-between gap-4 tabular-nums">
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="text-lg font-semibold text-gray-900">{c.label}</h3>
+                      <h3 className="text-lg font-semibold text-gray-900 whitespace-nowrap">{c.label}</h3>
                       <span className="text-xs text-gray-600">{c.units}</span>
                     </div>
-                    <div className="mt-1 text-sm text-gray-500">通常 {yen(c.normal)}（税込 {yen(c.normalTax)}）</div>
                   </div>
                   <div className="text-right">
-                    <div className="text-[18px] md:text-[20px] font-semibold text-gray-900">{yen(c.now)}（税込 {yen(c.nowTax)}）</div>
+                    <div className="text-[18px] md:text-[20px] font-semibold text-gray-900">{yen(c.nowTax)}</div>
                     <div className="text-xs text-emerald-700">-{c.off.toLocaleString()}円お得</div>
                   </div>
                 </li>

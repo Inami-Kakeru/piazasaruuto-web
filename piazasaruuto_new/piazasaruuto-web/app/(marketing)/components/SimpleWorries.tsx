@@ -63,7 +63,7 @@ export function SimpleWorries() {
             </div>
 
             {/* Right: photo（必要ならローカルパスに変更） */}
-            <figure className="md:order-none order-first">
+            <figure className="md:order-none order-last">
               <img
                 src="/images/店員とお客さん.png"
                 alt="落ち着いた店内で、やさしく声をかけながら施術するスタイリスト"
