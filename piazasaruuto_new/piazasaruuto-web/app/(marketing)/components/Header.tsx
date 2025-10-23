@@ -95,13 +95,14 @@ export function Header() {
               <Phone className="mk-icon" />
               <span>お電話</span>
             </a>
-            <a
-              href={SITE.bookingUrl}
-              id="headerReservationBtn"
-              className="mk-btn mk-btn-primary"
+            <button
+              disabled
+              className="mk-btn mk-btn-primary opacity-50 cursor-not-allowed"
+              aria-disabled="true"
+              title="Web予約は準備中です"
             >
-              Web予約
-            </a>
+              Web予約（準備中）
+            </button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -137,12 +138,14 @@ export function Header() {
                   <Phone className="mk-icon" />
                   <span>お電話</span>
                 </a>
-                <a
-                  href={SITE.bookingUrl}
-                  className="mk-btn mk-btn-primary"
+                <button
+                  disabled
+                  className="mk-btn mk-btn-primary opacity-50 cursor-not-allowed"
+                  aria-disabled="true"
+                  title="Web予約は準備中です"
                 >
-                  Web予約
-                </a>
+                  Web予約（準備中）
+                </button>
               </div>
             </div>
           </nav>

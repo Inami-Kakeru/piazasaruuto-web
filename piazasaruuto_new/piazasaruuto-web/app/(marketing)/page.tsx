@@ -43,15 +43,17 @@ export default function MarketingHome() {
       />
 
       {/* 固定予約ボタン（右下） */}
-      <a
-        href={SITE.bookingUrl}
-        className="mk-fab fixed bottom-6 right-6 md:bottom-10 md:right-10 z-[60]"
-        aria-label="ご予約はこちら"
+      <button
+        disabled
+        className="mk-fab fixed bottom-6 right-6 md:bottom-10 md:right-10 z-[60] opacity-50 cursor-not-allowed"
+        aria-label="Web予約は準備中です"
+        aria-disabled="true"
+        title="Web予約は準備中です"
         id="floatingReservationBtn"
       >
         <Calendar className="mk-fab-icon" />
-        <span className="mk-fab-label">ご予約</span>
-      </a>
+        <span className="mk-fab-label">準備中</span>
+      </button>
     </>
   );
 }

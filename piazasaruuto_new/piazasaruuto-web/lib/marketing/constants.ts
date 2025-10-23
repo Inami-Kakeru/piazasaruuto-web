@@ -7,7 +7,7 @@ export const SITE = {
   access: "西武池袋線「保谷駅」北口より徒歩1分。北口を出て線路沿いに直進し、1本目の角を左折。右手の『ほうやデンタルクリニック』の隣。",
   parking: "あり（台数に限りがあるため、事前にお電話でのご予約をお願いいたします）",
   hours_note: "月・火・水・金・土 10:00〜17:30（カット最終 16:30）／日・木 定休日",
-  bookingUrl: "/booking/menu",
+  bookingUrl: null,
   hotpepperUrl: "https://l.instagram.com/?u=http%3A%2F%2Fb.hpr.jp%2Fsd%2FH000605022%2F%3Ffbclid%3DPAZXh0bgNhZW0CMTEAAadb-FSuPVE3ZCGGwCfFVPcjlb4MQN07UukFLyffdOIGtuj4bq_vZas9zyIfKA_aem_wZQrx3qGy-jp5c2hbXDsAg&e=AT3f1PoKYdxe5NCck9_D-3xesI0lvHy0T4Te_MloN954ZI_O7Y5zZrr5I4io77DK46vMOffLZaIj4P7TZjV_ODk3qGx6Qt8IshqHZKe3XQRKZt5lbNg3Lla0iA",
   mapEmbedSrc: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3238.081599976219!2d139.56598757700579!3d35.74879907256545!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6018ee1b8f0e4e4f%3A0x1234567890abcdef!2z5Lqs6YO95LyJ6aas5Yy65Y2X5aSn5rOJ77yV77yN77yT77yV77yN77yY!5e0!3m2!1sja!2sjp!4v1234567890123!5m2!1sja!2sjp",
   instagramUrl: "#"

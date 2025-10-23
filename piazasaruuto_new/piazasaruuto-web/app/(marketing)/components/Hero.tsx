@@ -55,12 +55,14 @@ export function Hero() {
         </p>
         
         <div className="mk-hero-buttons">
-          <a
-            href={SITE.bookingUrl}
-            className="mk-btn mk-btn-primary"
+          <button
+            disabled
+            className="mk-btn mk-btn-primary opacity-50 cursor-not-allowed"
+            aria-disabled="true"
+            title="Web予約は準備中です"
           >
-            Web予約
-          </a>
+            Web予約（準備中）
+          </button>
           <a
             href={`tel:${SITE.tel}`}
             className="mk-btn mk-btn-secondary"

@@ -76,13 +76,15 @@ export function Footer() {
         <div className="mk-footer-cta">
           <p className="mk-footer-cta-text">ご予約・お問い合わせはこちら</p>
           <div className="mk-footer-cta-buttons">
-            <a
-              href={SITE.bookingUrl}
+            <button
+              disabled
               id="footerReservationBtn"
-              className="mk-btn mk-btn-primary"
+              className="mk-btn mk-btn-primary opacity-50 cursor-not-allowed"
+              aria-disabled="true"
+              title="Web予約は準備中です"
             >
-              Web予約
-            </a>
+              Web予約（準備中）
+            </button>
             <a
               href={`tel:${SITE.tel}`}
               className="mk-btn mk-btn-secondary"
