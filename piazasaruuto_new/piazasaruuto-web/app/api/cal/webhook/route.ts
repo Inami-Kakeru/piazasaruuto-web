@@ -25,11 +25,13 @@ export async function POST(req: NextRequest) {
     //   if (sig !== h) return respond({ error: "invalid signature" }, 401);
     // }
 
-    // 開発中はログで中身を確認
-    console.log("Cal.com webhook event:", {
-      event: payload?.event,
-      dataKeys: payload?.data ? Object.keys(payload.data) : [],
-    });
+    // 本番環境ではログを出力しない（開発環境のみ）
+    if (process.env.NODE_ENV === 'development') {
+      console.log("Cal.com webhook event:", {
+        event: payload?.event,
+        dataKeys: payload?.data ? Object.keys(payload.data) : [],
+      });
+    }
 
     // TODO: payload.event に応じてDB更新・通知等の処理
     return respond({ ok: true });

@@ -103,7 +103,10 @@ export default function ConfirmPage() {
       router.replace(`/booking/complete?${q.toString()}`);
     } catch (e: any) {
       setErr(e?.message ?? 'エラーが発生しました。もう一度お試しください。');
-      console.error('[confirm.error]', e);
+      // 本番環境ではログを出力しない（開発環境のみ）
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[confirm.error]', e);
+      }
     } finally {
       setSubmitting(false);
     }
