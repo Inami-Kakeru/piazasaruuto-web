@@ -9,9 +9,13 @@ const notoSansJP = Noto_Sans_JP({
 });
 
 export const metadata: Metadata = {
-  title: "ぴあざさるうと | 保谷駅徒歩1分の美容室",
-  description: "保谷駅北口より徒歩1分の美容室ぴあざさるうと。カット・カラー・パーマ・増毛エクステまで、お客様一人ひとりに寄り添ったサービスを提供いたします。",
-  keywords: ["美容室", "保谷", "練馬区", "カット", "カラー", "パーマ", "増毛エクステ", "ぴあざさるうと"],
+  title: "ぴあざさるうと | 保谷駅徒歩1分の髪質改善・増毛エクステ美容室",
+  description: "保谷駅北口より徒歩1分の美容室ぴあざさるうと。練馬区・西東京・大泉学園エリアで髪質改善と増毛エクステに特化したサロンです。カット・カラー・パーマはもちろん、年齢とともに変化する髪のお悩みに寄り添い、艶やかな髪へ導きます。",
+  keywords: [
+    "美容室", "保谷駅", "練馬", "西東京", "大泉学園", 
+    "髪質改善", "増毛エクステ", "ボリュームアップ", 
+    "カット", "カラー", "パーマ", "ぴあざさるうと", "Piazza Salute"
+  ],
   authors: [{ name: "ぴあざさるうと" }],
   creator: "ぴあざさるうと",
   publisher: "ぴあざさるうと",
@@ -25,8 +29,8 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "ぴあざさるうと | 保谷駅徒歩1分の美容室",
-    description: "保谷駅北口より徒歩1分の美容室ぴあざさるうと。カット・カラー・パーマ・増毛エクステまで、お客様一人ひとりに寄り添ったサービスを提供いたします。",
+    title: "ぴあざさるうと | 保谷駅徒歩1分の髪質改善・増毛エクステ美容室",
+    description: "保谷駅北口より徒歩1分の美容室ぴあざさるうと。練馬区・西東京・大泉学園エリアで髪質改善と増毛エクステに特化したサロンです。丁寧なカウンセリングと技術で、あなたの理想のスタイルを叶えます。",
     url: "https://piazza-salute.com",
     siteName: "ぴあざさるうと",
     locale: "ja_JP",
@@ -42,8 +46,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "ぴあざさるうと | 保谷駅徒歩1分の美容室",
-    description: "保谷駅北口より徒歩1分の美容室ぴあざさるうと。カット・カラー・パーマ・増毛エクステまで、お客様一人ひとりに寄り添ったサービスを提供いたします。",
+    title: "ぴあざさるうと | 保谷駅徒歩1分の髪質改善・増毛エクステ美容室",
+    description: "保谷駅北口より徒歩1分の美容室ぴあざさるうと。練馬区・西東京・大泉学園エリアで髪質改善と増毛エクステに特化したサロンです。",
     images: ["/images/お店の外観.png"],
   },
   robots: {
@@ -56,9 +60,6 @@ export const metadata: Metadata = {
       "max-image-preview": "large",
       "max-snippet": -1,
     },
-  },
-  verification: {
-    google: "your-google-verification-code", // 実際のコードに置き換え
   },
 };
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, Suspense } from 'react';
 
 const TIME_ZONE = 'Asia/Tokyo';
 
@@ -39,7 +39,7 @@ async function fetchJson(input: RequestInfo, init?: RequestInit) {
   return { res, data };
 }
 
-export default function ConfirmPage() {
+function ConfirmPageContent() {
   const sp = useSearchParams();
   const router = useRouter();
 
@@ -178,5 +178,13 @@ export default function ConfirmPage() {
         </div>
       </section>
     </>
+  );
+}
+
+export default function ConfirmPage() {
+  return (
+    <Suspense fallback={<div>読み込み中...</div>}>
+      <ConfirmPageContent />
+    </Suspense>
   );
 }

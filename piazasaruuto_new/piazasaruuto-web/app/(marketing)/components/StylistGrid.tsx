@@ -31,7 +31,7 @@ export function StylistGrid() {
               </div>
               
               <blockquote className="mk-stylist-catch">
-                "{stylist.catch}"
+                &ldquo;{stylist.catch}&rdquo;
               </blockquote>
               
               <p className="mk-stylist-profile">

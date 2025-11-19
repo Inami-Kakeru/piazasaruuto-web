@@ -1,9 +1,10 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, Suspense } from 'react';
+import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
-export default function CompletePage() {
+function CompletePageContent() {
   const sp = useSearchParams();
 
   const p = useMemo(() => {
@@ -63,9 +64,17 @@ export default function CompletePage() {
         </dl>
 
         <div className="actions" style={{ marginTop: 16 }}>
-          <a className="btn btn-primary" href="/">トップに戻る</a>
+          <Link className="btn btn-primary" href="/">トップに戻る</Link>
         </div>
       </section>
     </main>
+  );
+}
+
+export default function CompletePage() {
+  return (
+    <Suspense fallback={<div>読み込み中...</div>}>
+      <CompletePageContent />
+    </Suspense>
   );
 }

@@ -5,7 +5,7 @@ export function About() {
         <div className="mk-about-header">
           <h2 className="mk-about-title">About</h2>
           <p className="mk-about-subtitle">
-            世代を問わず多くの支持を集めるプライベート空間で、"もっと輝く私"に。髪の悩みに寄り添い、あなたの「なりたい」を叶えるサロン
+            世代を問わず多くの支持を集めるプライベート空間で、&ldquo;もっと輝く私&rdquo;に。髪の悩みに寄り添い、あなたの「なりたい」を叶えるサロン
           </p>
         </div>
 

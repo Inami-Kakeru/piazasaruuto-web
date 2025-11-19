@@ -1,3 +1,5 @@
+import { SITE } from "../../../lib/marketing/constants";
+
 export function PriceTable() {
   const items = [
     { name: "ヘアカット", price: "¥2,900", note: undefined },
@@ -53,26 +55,31 @@ export function PriceTable() {
 
             <div className="mt-6 flex flex-col items-stretch gap-3">
               <a
-                href="/reserve"
-                aria-label="予約へ進む"
+                href={SITE.bookingUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="ホットペッパービューティーでWeb予約"
                 className="inline-flex items-center justify-center rounded-lg py-3 px-6 bg-emerald-600 text-white font-medium hover:bg-emerald-700"
               >
-                予約はこちら
+                Web予約はこちら
               </a>
               <div className="text-center text-xs text-gray-500">or</div>
               <div className="rounded-lg px-4 py-3 bg-gray-50">
                 <div className="text-sm font-medium text-gray-800">お電話でも予約できます</div>
                 <div className="mt-1 text-base text-gray-900">
-                  📞 <a href="tel:03-3978-4800" className="underline">03-3978-4800</a>
+                  📞 <a href={`tel:${SITE.tel}`} className="underline">{SITE.tel}</a>
                 </div>
                 <div className="text-xs text-gray-500">（受付時間 10:00〜17:30）</div>
                 <div className="mt-3">
-                  <a href="tel:03-3978-4800" className="inline-flex items-center justify-center rounded-lg py-2.5 px-4 bg-white text-gray-900 border hover:bg-gray-50 w-full" aria-label="電話をかける">
+                  <a href={`tel:${SITE.tel}`} className="inline-flex items-center justify-center rounded-lg py-2.5 px-4 bg-white text-gray-900 border hover:bg-gray-50 w-full" aria-label="電話をかける">
                     電話をかける
                   </a>
                 </div>
               </div>
-              <p className="text-xs text-gray-500">※ 店舗、LINEでもご予約を承っております。</p>
+              <p className="text-xs text-gray-500">
+                ※増毛エクステのご予約はお電話にて承っております<br />
+                ※店舗、LINEでもご予約を承っております。
+              </p>
             </div>
           </aside>
         </div>

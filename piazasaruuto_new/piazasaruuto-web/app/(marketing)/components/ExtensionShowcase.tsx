@@ -1,4 +1,5 @@
 import { SITE } from "../../../lib/marketing/constants";
+import { Phone, MapPin } from "lucide-react";
 
 export function ExtensionShowcase() {
   return (
@@ -38,18 +39,18 @@ export function ExtensionShowcase() {
 
             {/* 本文 */}
             <p className="mt-3 text-[18px] md:text-[20px] leading-8 text-gray-700">
-              分け目・つむじの“ぺたん”が気になる方へ。地毛を傷めない方法で、必要な分だけ自然にボリュームを補います。はじめての方にも丁寧にご説明します。
+              分け目・つむじの"ぺたん"が気になる方へ。地毛を傷めない方法で、必要な分だけ自然にボリュームを補います。はじめての方にも丁寧にご説明します。
             </p>
 
-            {/* 予約CTA */}
-            <div className="mt-6 text-center">
-              <a
-                href={SITE.bookingUrl}
-                className="mk-btn mk-btn-primary mk-extension-cta-btn"
-              >
-                ご予約はこちら
+            {/* 予約案内（ブロック装飾なしのシンプル表記） */}
+            <p className="mt-4 text-[16px] md:text-[17px] text-gray-700">
+              電話、店舗でご予約を承っております。<br/>
+              お電話：
+              <a href={`tel:${SITE.tel}`} className="underline ml-1" aria-label={`電話番号 ${SITE.tel} に発信`}>
+                {SITE.tel}
               </a>
-            </div>
+            </p>
+            <p className="text-sm text-gray-600 mt-1">受付時間：{SITE.hours_note}</p>
           </div>
         </div>
 

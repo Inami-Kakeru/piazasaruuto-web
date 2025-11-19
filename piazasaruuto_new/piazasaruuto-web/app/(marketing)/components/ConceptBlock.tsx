@@ -7,7 +7,7 @@ export function ConceptBlock() {
             id="concept-title"
             className="text-3xl md:text-5xl font-semibold tracking-tight text-gray-900"
           >
-            私たちの想い
+            保谷で叶える、理想の髪質改善
           </h2>
           <div className="mx-auto mt-3 h-[2px] w-16 rounded-full bg-gray-200" />
         </header>
@@ -18,19 +18,19 @@ export function ConceptBlock() {
             {/* セクション1 */}
             <h3 className="text-xl md:text-2xl font-semibold text-gray-900">毎日がラクに、気持ちよく。</h3>
             <p className="mt-2">
-              安心して髪を任せられる、そんな美容室を目指しています。
+              西東京・練馬エリアで、安心して髪を任せられる美容室を目指しています。
             </p>
 
             {/* セクション2 */}
             <h3 className="mt-6 text-xl md:text-2xl font-semibold text-gray-900">静かに過ごせる、やさしい空間</h3>
             <p className="mt-2">
-              完全予約のマンツーマン対応。おしゃべりが好きな方も、静かに過ごしたい方も、気兼ねなく過ごせる空間を整えています。
+              完全予約のマンツーマン対応。保谷駅から徒歩1分の立地にありながら、静かにリラックスできるプライベート空間です。
             </p>
 
             {/* セクション3 */}
             <h3 className="mt-6 text-xl md:text-2xl font-semibold text-gray-900">髪と肌をいたわるこだわり</h3>
             <p className="mt-2">
-              店内の水はすべて<b className="font-semibold text-gray-900"> 肌にやさしい軟水</b>を使用。年齢や髪質に合わせて、扱いやすい髪型になるよう丁寧にご提案しています。
+              店内の水はすべて<b className="font-semibold text-gray-900"> 肌にやさしい軟水</b>を使用。髪質改善メニューや増毛エクステなど、年齢や髪質に合わせた丁寧なご提案をいたします。
             </p>
 
             {/* セクション4 */}

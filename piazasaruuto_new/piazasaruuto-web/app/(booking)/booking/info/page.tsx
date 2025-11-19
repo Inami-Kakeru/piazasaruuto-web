@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, Suspense } from 'react';
 
 function formatJp(iso?: string) {
   if (!iso) return '-';
@@ -15,6 +15,14 @@ function formatJp(iso?: string) {
 }
 
 export default function InfoPage() {
+  return (
+    <Suspense fallback={<div>読み込み中...</div>}>
+      <InfoPageContent />
+    </Suspense>
+  );
+}
+
+function InfoPageContent() {
   const sp = useSearchParams();
   const router = useRouter();
 

@@ -71,9 +71,7 @@ export function SimpleWorries() {
                 loading="lazy"
               />
               <figcaption className="mt-2 text-center text-sm text-gray-500">
-                <a href="/staff#hoshino" className="underline underline-offset-2 hover:text-gray-700">
-                  美容師　星野 晶代
-                </a>
+                美容師　角田 良美
                 （増毛エクステのご相談も安心してお任せください）
               </figcaption>
             </figure>

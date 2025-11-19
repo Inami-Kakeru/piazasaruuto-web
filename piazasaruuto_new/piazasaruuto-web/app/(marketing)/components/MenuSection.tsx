@@ -146,12 +146,23 @@ export default function MenuSection() {
               <p className="mt-1 text-sm text-gray-600">Webとお電話のどちらからでも承ります。</p>
             </header>
             <div className="mt-4 flex flex-col gap-3">
-              <a href={SITE.bookingUrl} className="mk-btn mk-btn-primary h-12 text-base" aria-label="Web予約へ進む">予約はこちら</a>
+              <a
+                href={SITE.bookingUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mk-btn mk-btn-primary h-12 text-base"
+                aria-label="ホットペッパービューティーでWeb予約"
+              >
+                Web予約はこちら
+              </a>
               <a href={`tel:${SITE.tel}`} className="mk-btn h-12 text-base" style={{border:'1px solid #d1d5db', background:'#fff'}} aria-label="電話で予約する">
                 <Phone className="mk-icon" aria-hidden />
                 <span>お電話で予約する</span>
               </a>
             </div>
+            <p className="mt-2 text-xs text-gray-500">
+              ※増毛エクステのご予約はお電話にて承っております
+            </p>
             <p className="mt-2 text-xs text-gray-500">受付時間 10:00〜17:30</p>
           </article>
         </div>
@@ -186,9 +197,14 @@ export default function MenuSection() {
 
           {/* 予約ボタン */}
           <div className="mt-6 text-center">
-            <a href={SITE.bookingUrl} className="mk-btn mk-btn-primary inline-flex h-12 text-base" aria-label="増毛エクステの予約はこちら">
-              増毛エクステの予約はこちら
-            </a>
+            <button
+              disabled
+              className="mk-btn mk-btn-primary inline-flex h-12 text-base opacity-50 cursor-not-allowed"
+              aria-disabled="true"
+              title="Web予約は準備中です"
+            >
+              増毛エクステの予約はこちら（準備中）
+            </button>
           </div>
         </section>
       </div>

@@ -95,14 +95,15 @@ export function Header() {
               <Phone className="mk-icon" />
               <span>お電話</span>
             </a>
-            <button
-              disabled
-              className="mk-btn mk-btn-primary opacity-50 cursor-not-allowed"
-              aria-disabled="true"
-              title="Web予約は準備中です"
+            <a
+              href={SITE.bookingUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mk-btn mk-btn-primary"
+              aria-label="ホットペッパービューティーでWeb予約"
             >
-              Web予約（準備中）
-            </button>
+              Web予約
+            </a>
           </div>
 
           {/* Mobile Menu Button */}
@@ -119,33 +120,36 @@ export function Header() {
         {/* Mobile Navigation */}
         {isMenuOpen && (
           <nav className="mk-header-mobile-nav" role="navigation" aria-label="モバイルナビゲーション">
-            <div className="mk-header-mobile-content">
-              {NAV_ITEMS.map((item) => (
-                <button
-                  key={item.href}
-                  onClick={() => handleNavClick(item)}
-                  className="mk-header-mobile-link"
-                >
-                  {item.label}
-                </button>
-              ))}
-              <div className="mk-header-mobile-cta">
+            <div className="mk-container">
+              <div className="mk-header-mobile-content">
+                {NAV_ITEMS.map((item) => (
+                  <button
+                    key={item.href}
+                    onClick={() => handleNavClick(item)}
+                    className="mk-header-mobile-link"
+                  >
+                    {item.label}
+                  </button>
+                ))}
+                <div className="mk-header-mobile-cta">
+                  <a
+                    href={`tel:${SITE.tel}`}
+                    className="mk-btn mk-btn-secondary"
+                    aria-label={`電話番号 ${SITE.tel} に発信`}
+                  >
+                    <Phone className="mk-icon" />
+                    <span>お電話</span>
+                  </a>
                 <a
-                  href={`tel:${SITE.tel}`}
-                  className="mk-btn mk-btn-secondary"
-                  aria-label={`電話番号 ${SITE.tel} に発信`}
+                  href={SITE.bookingUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mk-btn mk-btn-primary"
+                  aria-label="ホットペッパービューティーでWeb予約"
                 >
-                  <Phone className="mk-icon" />
-                  <span>お電話</span>
+                  Web予約
                 </a>
-                <button
-                  disabled
-                  className="mk-btn mk-btn-primary opacity-50 cursor-not-allowed"
-                  aria-disabled="true"
-                  title="Web予約は準備中です"
-                >
-                  Web予約（準備中）
-                </button>
+                </div>
               </div>
             </div>
           </nav>

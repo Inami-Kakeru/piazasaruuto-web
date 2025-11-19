@@ -4,7 +4,7 @@ import { useState } from "react";
 import { SITE } from "../../../lib/marketing/constants";
 
 type AccessBlockProps = {
-  reserveHref?: string;
+  reserveHref?: string | null;
   mapEmbedSrc?: string;
   mapExternalHref?: string;
   photoSrc?: string;
@@ -178,10 +178,13 @@ export function AccessBlock({
                   <p>
                     <b className="font-semibold text-gray-900">Web予約：</b>
                     {reserveHref ? (
-                      <a href={reserveHref} className="underline ml-1">こちらから</a>
+                      <a href={reserveHref} target="_blank" rel="noopener noreferrer" className="underline ml-1">ホットペッパービューティーから予約</a>
                     ) : (
                       <span className="ml-1">準備中</span>
                     )}
+                  </p>
+                  <p className="text-sm text-gray-600 mt-1">
+                    ※増毛エクステのご予約はお電話にて承っております
                   </p>
                   <p>
                     <b className="font-semibold text-gray-900">LINE・店頭：</b>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 type Slot = { start: string; end: string };
@@ -25,6 +25,14 @@ function toDayRangeIsoJst(ymd: string) {
 }
 
 export default function DatePage() {
+  return (
+    <Suspense fallback={<div>読み込み中...</div>}>
+      <DatePageContent />
+    </Suspense>
+  );
+}
+
+function DatePageContent() {
   const router = useRouter();
   const sp = useSearchParams();
 

@@ -59,11 +59,19 @@ export class Logger {
     const level = statusCode >= 400 ? 'ERROR' : 'INFO';
     const message = `API Response: ${statusCode}`;
     
-    this[level.toLowerCase() as keyof Logger](message, {
-      statusCode,
-      duration: Date.now() - this.startTime,
-      ...context,
-    });
+    if (level === 'ERROR') {
+      this.error(message, {
+        statusCode,
+        duration: Date.now() - this.startTime,
+        ...context,
+      });
+    } else {
+      this.info(message, {
+        statusCode,
+        duration: Date.now() - this.startTime,
+        ...context,
+      });
+    }
   }
 
   // エラーログ用

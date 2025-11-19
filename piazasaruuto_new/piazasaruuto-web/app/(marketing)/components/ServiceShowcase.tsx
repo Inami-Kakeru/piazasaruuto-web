@@ -3,19 +3,19 @@ export function ServiceShowcase() {
     {
       title: "似合わせカット",
       desc: "乾かすだけでまとまる、毎日がラクに。",
-      img: "/images/似合わせカット_gemini.png",
+      img: "/images/insta/カットモデル_似合う.JPG",
       href: "/menu#cut",
     },
     {
       title: "イノアカラー（オイルカラー）",
       desc: "においが少なく、艶やかに。肌映えする色へ。",
-      img: "https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=800&h=800&fit=crop&crop=face",
+      img: "/images/inoa-new-shade-2502.webp",
       href: "/menu#inoa",
     },
     {
-      title: "ヘッドスパ＆シャンプー",
-      desc: "やさしい圧でリフレッシュ。土台から整える。",
-      img: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&h=800&fit=crop&crop=face",
+      title: "TOKIOシャンプー＋カット",
+      desc: "艶やかな髪へ。なりたいスタイルを再現性高くご提案。",
+      img: "/images/salon_to_home_c2.png",
       href: "/menu#spa",
     },
     {
@@ -27,8 +27,8 @@ export function ServiceShowcase() {
   ];
 
   const staff = [
-    { img: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=48&h=48&fit=crop&crop=face", name: "角田 良美", role: "スタイリスト", note: "手ぐしで決まる仕上げを。" },
-    { img: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=48&h=48&fit=crop&crop=face", name: "松本 貴子", role: "スタイリスト", note: "やさしい色で表情まで明るく。" },
+    { img: "/images/カクタヨシミ_正方形.png", name: "角田 良美", role: "スタイリスト", note: "手ぐしで決まる仕上げを。" },
+    { img: "/images/マツモトタカコ_正方形.png", name: "松本 貴子", role: "スタイリスト", note: "やさしい色で表情まで明るく。" },
   ];
 
   return (
@@ -67,7 +67,7 @@ export function ServiceShowcase() {
         <div className="flex flex-col md:flex-row items-center justify-center gap-8 max-w-5xl mx-auto">
           {staff.map((s, index) => (
             <div key={s.name} className="flex items-center gap-6">
-              <img src={s.img} alt="" className="w-48 h-48 rounded-full object-cover flex-shrink-0" />
+              <img src={s.img} alt={`${s.name}のプロフィール写真`} className="w-48 h-48 rounded-full object-cover flex-shrink-0" />
               <div className="text-base leading-7 text-gray-700">
                 <b className="text-gray-900 text-lg">{s.name}</b>
                 <div className="text-gray-500 text-sm mt-1">（{s.role}）</div>

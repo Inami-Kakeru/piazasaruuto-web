@@ -11,37 +11,37 @@ const SwiperComponent = dynamic(
   { ssr: false, loading: () => <div className="mk-instagram-loading"></div> }
 );
 
-// ダミーのInstagram投稿データ
+// Instagram投稿データ
 const instagramPosts = [
   {
     id: 1,
-    image: "/photos/extension_hero.jpg",
-    alt: "最新のカットスタイル",
-    caption: "お客様のライフスタイルに合わせたカットスタイル✨"
+    image: "/images/insta/カットモデル_似合う.JPG",
+    alt: "カットモデル",
+    caption: "お客様に似合うカットスタイル✨"
   },
   {
     id: 2,
-    image: "https://images.unsplash.com/photo-1722935408489-2bf93349c8cb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxoYWlyJTIwc2Fsb24lMjBpbnN0YWdyYW0lMjBiZWF1dHl8ZW58MXx8fHwxNzU3MDAyMDI1fDA&ixlib=rb-4.1.0&q=80&w=1080", 
-    alt: "カラーリング作品",
-    caption: "自然な白髪ぼかしで若々しい印象に💫"
+    image: "/images/insta/モデルの女性.JPG",
+    alt: "モデルの女性",
+    caption: "自然な仕上がりで毎日がラクに💫"
   },
   {
     id: 3,
-    image: "https://images.unsplash.com/photo-1651713325384-dd0f1e381534?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBoYWlyJTIwc2Fsb24lMjBleHRlcmlvciUyMGJ1aWxkaW5nfGVufDF8fHx8MTc1NzAwMjAxOHww&ixlib=rb-4.1.0&q=80&w=1080",
-    alt: "サロンの様子",
-    caption: "リラックスできる空間でお待ちしております🌿"
+    image: "/images/insta/おしゃれな美容グッズ.JPG",
+    alt: "おしゃれな美容グッズ",
+    caption: "こだわりの美容グッズでお手入れをサポート🌿"
   },
   {
     id: 4,
-    image: "https://images.unsplash.com/photo-1722935408489-2bf93349c8cb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxoYWlyJTIwc2Fsb24lMjBpbnN0YWdyYW0lMjBiZWF1dHl8ZW58MXx8fHwxNzU3MDAyMDI1fDA&ixlib=rb-4.1.0&q=80&w=1080",
-    alt: "トリートメント効果",
-    caption: "TOKIOトリートメントでツヤ髪に✨"
+    image: "/images/insta/クーポン情報.png",
+    alt: "クーポン情報",
+    caption: "お得なクーポン情報をチェック✨"
   },
   {
     id: 5,
-    image: "https://images.unsplash.com/photo-1737063935340-f9af0940c4c5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx3b21hbiUyMGhhaXJzdHlsaXN0JTIwcHJvZmVzc2lvbmFsJTIwcG9ydHJhaXR8ZW58MXx8fHwxNzU3MDAyMDIyfDA&ixlib=rb-4.1.0&q=80&w=1080",
-    alt: "エクステスタイル",
-    caption: "ボリュームアップエクステで理想のスタイルに💇‍♀️"
+    image: "/images/insta/インスタのQR.JPG",
+    alt: "Instagram QRコード",
+    caption: "Instagramで最新情報をチェック💇‍♀️"
   }
 ];
 

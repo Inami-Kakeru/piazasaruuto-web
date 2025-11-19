@@ -1,4 +1,4 @@
-import { Phone, Mail, Clock, MapPin } from "lucide-react";
+import { Phone, Clock, MapPin, Instagram as InstagramIcon } from "lucide-react";
 import { SITE } from "../../../lib/marketing/constants";
 
 export function Footer() {
@@ -20,6 +20,16 @@ export function Footer() {
             <p className="mk-footer-description">
               世代を問わず愛される美容室として、お客様一人ひとりに寄り添ったサービスを提供いたします。
             </p>
+            {/* クイックナビ */}
+            <nav aria-label="フッターナビゲーション" className="mt-3">
+              <div className="mk-footer-content">
+                <a href="#hero" className="mk-footer-contact-link">ホーム</a>
+                <a href="#menu-intro" className="mk-footer-contact-link">メニュー紹介</a>
+                <a href="/menu" className="mk-footer-contact-link">メニュー詳細</a>
+                <a href="#access" className="mk-footer-contact-link">アクセス</a>
+                <a href="#instagram" className="mk-footer-contact-link">Instagram</a>
+              </div>
+            </nav>
           </div>
 
           {/* アクセス情報 */}
@@ -62,11 +72,14 @@ export function Footer() {
                 <span>{SITE.tel}</span>
               </a>
               <a
-                href={`mailto:${SITE.email}`}
+                href={SITE.instagramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="mk-footer-contact-link"
+                aria-label="Instagramを開く"
               >
-                <Mail className="mk-footer-contact-icon" />
-                <span>{SITE.email}</span>
+                <InstagramIcon className="mk-footer-contact-icon" />
+                <span>Instagram</span>
               </a>
             </div>
           </div>
@@ -76,15 +89,16 @@ export function Footer() {
         <div className="mk-footer-cta">
           <p className="mk-footer-cta-text">ご予約・お問い合わせはこちら</p>
           <div className="mk-footer-cta-buttons">
-            <button
-              disabled
+            <a
+              href={SITE.bookingUrl}
+              target="_blank"
+              rel="noopener noreferrer"
               id="footerReservationBtn"
-              className="mk-btn mk-btn-primary opacity-50 cursor-not-allowed"
-              aria-disabled="true"
-              title="Web予約は準備中です"
+              className="mk-btn mk-btn-primary"
+              aria-label="ホットペッパービューティーでWeb予約"
             >
-              Web予約（準備中）
-            </button>
+              Web予約
+            </a>
             <a
               href={`tel:${SITE.tel}`}
               className="mk-btn mk-btn-secondary"
@@ -98,6 +112,9 @@ export function Footer() {
         {/* 著作権 */}
         <div className="mk-footer-copyright">
           <p>© 2024 {SITE.name} ({SITE.subtitle}). All rights reserved.</p>
+          <p className="mt-2 text-sm">
+            <a href="#hero" className="underline">トップに戻る</a>
+          </p>
         </div>
       </div>
     </footer>
